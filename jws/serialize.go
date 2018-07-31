@@ -1,19 +1,21 @@
 package jws
 
-import (
-	"encoding/ascii85"
-
-	jwt "github.com/vegaj/jwt/jwt"
-)
-
 //SignSettings signature settings
 type SignSettings struct {
+	//Algorithm to be used must be a Signature Algorithm Name found in jwa package.
+	Algorithm string
+	//SingKey is the key to be used to create the digital signature. Same as VerifyKey in HSXXX cases.
+	SingKey []byte
+	//VerifyKey is the key to be used to verify the digital signature.
+	VerifyKey []byte
 }
 
-func Compact(token jwt.JWT, settings SignSettings, secret []byte) string {
+//SignWith implements the jwa.Signer interface
+func (s SignSettings) SignWith() []byte {
+	return s.SingKey
+}
 
-	//Ignoring settings by now
-
-	ascii85.Encode(result)
-	return ""
+//VerifyWith implements the jwa.Verifier interface
+func (s SignSettings) VerifyWith() []byte {
+	return s.VerifyKey
 }

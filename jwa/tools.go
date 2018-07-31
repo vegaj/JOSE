@@ -1,36 +1,45 @@
 package jwa
 
 import (
+	"encoding/binary"
 	"errors"
 	"io"
+	"math/big"
 )
 
-const (
-	//ErrIllegalIndex means that the given offset is out of bounds.
-	ErrIllegalIndex = `the writting index is illegal`
-	//ErrInvalidWhence is not SeekStart, SeekCurrent nor SeekEnd.
-	ErrInvalidWhence = `reference is not SeekStart, SeekCurrent nor SeekEnd`
-	//ErrNoSpace the writer cannot fit the requested data.
-	ErrNoSpace = `not enough space`
-)
-
-//OctectWriter is a io.WriteSeeker
-type OctectWriter struct {
+//ECSignatureWriter is a io.WriteSeeker
+type ECSignatureWriter struct {
 	Data  []byte
 	Index int64
 }
 
+//NewOctetWriter returns the valid writer for the P-256 Sha-256 digital signature generation
+func NewOctetWriter(ECIdentifier string) (ECSignatureWriter, error) {
+	if ECIdentifier == ECP256Name {
+		return ECSignatureWriter{Data: make([]byte, ECP256Octets, ECP256Octets), Index: 0}, nil
+	} else if ECIdentifier == ECP384Name {
+		return ECSignatureWriter{Data: make([]byte, ECP384Octets, ECP384Octets), Index: 0}, nil
+	} else if ECIdentifier == ECP512Name {
+		return ECSignatureWriter{Data: make([]byte, ECP512Octets, ECP512Octets), Index: 0}, nil
+	}
+	return ECSignatureWriter{}, errors.New(ErrInvalidInput)
+}
+
 //RemainingSpace is the number of bytes that can be written into this writer.
-func (o OctectWriter) RemainingSpace() int64 {
+func (o ECSignatureWriter) RemainingSpace() int64 {
 	return int64(cap(o.Data)) - o.Index
 }
 
 //Write up to the remaining space inside OctectWriter from p.
 //If p has more space than the remaining inside
-func (o *OctectWriter) Write(p []byte) (n int, err error) {
+func (o *ECSignatureWriter) Write(p []byte) (n int, err error) {
 
-	var space = int64(cap(o.Data)) - o.Index
+	var space = o.RemainingSpace()
 	var toWrite = space
+
+	if p == nil {
+		return 0, errors.New(ErrInvalidSource)
+	}
 
 	if space == 0 {
 		return 0, errors.New(ErrNoSpace)
@@ -59,7 +68,7 @@ Seek returns the new offset relative to the start of the file and an error, if a
 Seeking to an offset before the start of the file is an error.
 Seeking to any positive offset is legal, and will be set to
 */
-func (o *OctectWriter) Seek(offset int64, whence int) (int64, error) {
+func (o *ECSignatureWriter) Seek(offset int64, whence int) (int64, error) {
 
 	if offset < 0 {
 		return int64(o.Index), errors.New(ErrIllegalIndex)
@@ -82,4 +91,32 @@ func (o *OctectWriter) Seek(offset int64, whence int) (int64, error) {
 
 	o.Index = position
 	return position, nil
+}
+
+//WriteNumber will write the data encoded in binary.Little-Endian or binary.Big-Endian acording to order
+//As the signature is made out of two big integers, and the whole capacity must be filled, AddBytes
+func (o *ECSignatureWriter) WriteNumber(x *big.Int, order binary.ByteOrder) error {
+	if x == nil {
+		return errors.New(ErrInvalidInput)
+	}
+	return binary.Write(o, order, fillBytes(x.Bytes(), cap(o.Data)/2))
+}
+
+//Reset sets the seeker to the start
+func (o *ECSignatureWriter) Reset() {
+	o.Index = 0
+}
+
+func fillBytes(src []byte, capacity int) []byte {
+
+	data := make([]byte, capacity)
+	for i := 0; i < capacity; i++ {
+		if i < len(src) {
+			data[i] = src[i]
+		} else {
+			data[i] = 0
+		}
+	}
+
+	return data
 }
