@@ -84,8 +84,11 @@ const (
 
 //Signer interface
 type Signer interface{ SignWith() []byte }
+
+//Verifier interface
 type Verifier interface{ VerifyWith() []byte }
 
+//SignES256 Implement it in JSW
 func SignES256(message, serializedPrivateKey []byte) (signature []byte, err error) {
 
 	//Create Hash
@@ -111,6 +114,7 @@ func SignES256(message, serializedPrivateKey []byte) (signature []byte, err erro
 	return signature, nil
 }
 
+//ECSignature Implement it in JSW
 func ECSignature(hash, serializedPrivateKey []byte) (r, s *big.Int, err error) {
 
 	zero := big.NewInt(0)
@@ -122,6 +126,7 @@ func ECSignature(hash, serializedPrivateKey []byte) (r, s *big.Int, err error) {
 	return ecdsa.Sign(rand.Reader, privateKey, hash)
 }
 
+//ECVerify Implement it in JWS
 func ECVerify(serializedPublicKey, hash []byte, r, s *big.Int) bool {
 
 	publicKey, err := x509.ParsePKIXPublicKey(serializedPublicKey)
