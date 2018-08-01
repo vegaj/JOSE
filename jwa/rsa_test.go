@@ -69,3 +69,29 @@ func Test_RSA512_SignVerify(t *testing.T) {
 	}
 
 }
+
+func Test_RSA_EnsureKeyLength(t *testing.T) {
+
+	smallKey, err := rsa.GenerateKey(rand.Reader, 1024)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	smallPrivate := x509.MarshalPKCS1PrivateKey(smallKey)
+	smallPublic := x509.MarshalPKCS1PublicKey(&smallKey.PublicKey)
+
+	signature, err := RSASign(testDefaultMessage, smallPrivate, RS256)
+	if err == nil {
+		t.Fatalf("Expected error due to key smaller than 2048 bits.")
+	} else if err.Error() != ErrInvalidKeyLength {
+		t.Fatalf("Encountered error, but not the expected one: %v, found: %v", ErrInvalidKeyLength, err)
+	}
+
+	err = RSAVerify(testDefaultMessage, signature, smallPublic, RS256)
+	if err == nil {
+		t.Fatalf("Expected error due to key smaller than 2048 bits.")
+	} else if err.Error() != ErrInvalidKeyLength {
+		t.Fatalf("Encountered error, but not the expected one: %v, found: %v", ErrInvalidKeyLength, err)
+	}
+
+}

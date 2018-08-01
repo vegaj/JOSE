@@ -83,6 +83,15 @@ const (
 	//ErrInvalidCurve means that the given curve is not appropriate in this context.
 	//It could be because the curve is not recognized or because a different one was expected.
 	ErrInvalidCurve = `invalid curve`
+	//ErrInvalidKeyLength means that the used key has an invalid size.
+	ErrInvalidKeyLength = `invalid key length`
+)
+
+const (
+	//RSAMinBitLength is the minimum length that a RSA key can have.
+	// A key of size 2048 bits or larger MUST be used with these algorithms.
+	//Defined Here: https://tools.ietf.org/html/rfc7518#section-3.3
+	RSAMinBitLength = 2048
 )
 
 //Signer interface

@@ -8,6 +8,7 @@ import (
 	"crypto/sha512"
 	"crypto/x509"
 	"errors"
+	"hash"
 	"math/big"
 )
 
@@ -26,7 +27,7 @@ func EllipticSign(message, privateKey []byte, alg Algorithm) (r, s *big.Int, err
 		return zero, zero, err
 	}
 
-	hash := hashForAlg(message, alg)
+	hash := doHashAlg(message, alg)
 	if hash == nil {
 		return zero, zero, errors.New(ErrInvalidAlgorithm)
 	}
@@ -48,7 +49,7 @@ func EllipticVerify(message, publicKey []byte, r, s *big.Int, alg Algorithm) err
 			return err
 		}
 
-		hash := hashForAlg(message, alg)
+		hash := doHashAlg(message, alg)
 		if hash == nil {
 			return errors.New(ErrInvalidAlgorithm)
 		}
@@ -62,19 +63,21 @@ func EllipticVerify(message, publicKey []byte, r, s *big.Int, alg Algorithm) err
 	return errors.New(ErrInvalidKey)
 }
 
-func hashForAlg(message []byte, alg Algorithm) []byte {
-	var hash []byte
+func doHashAlg(message []byte, alg Algorithm) []byte {
+	var hash hash.Hash
 	switch alg {
 	case EC256:
-		hash = sha256.New().Sum(message)
+		hash = sha256.New()
 	case EC384:
-		hash = sha512.New384().Sum(message)
+		hash = sha512.New384()
 	case EC521:
-		hash = sha512.New().Sum(message)
+		hash = sha512.New()
 	default:
 		return nil
 	}
-	return hash
+
+	hash.Write(message)
+	return hash.Sum(nil)
 }
 
 //Each ECXXX algorithm has a curve assigned. If the key has a Curve with a name different that

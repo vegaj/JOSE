@@ -19,6 +19,10 @@ func RSASign(message, privateKey []byte, alg Algorithm) ([]byte, error) {
 		return nil, err
 	}
 
+	if err = rsaCheckKeyLen(priv); err != nil {
+		return nil, err
+	}
+
 	var hashAlg = translateAlgorithm(alg)
 
 	var hash = doHash(message, hashAlg)
@@ -37,6 +41,10 @@ func RSAVerify(message, signature, publicKey []byte, alg Algorithm) error {
 
 	pub, err := x509.ParsePKCS1PublicKey(publicKey)
 	if err != nil {
+		return err
+	}
+
+	if err = rsaCheckKeyLen(pub); err != nil {
 		return err
 	}
 
@@ -73,4 +81,21 @@ func doHash(message []byte, alg crypto.Hash) []byte {
 	}
 	h.Write(message)
 	return h.Sum(nil)
+}
+
+func rsaCheckKeyLen(rsaKey interface{}) error {
+
+	switch key := rsaKey.(type) {
+	case *rsa.PrivateKey:
+		if key.N.BitLen() >= RSAMinBitLength {
+			return nil
+		}
+	case *rsa.PublicKey:
+		if key.N.BitLen() >= RSAMinBitLength {
+			return nil
+		}
+	default:
+		return errors.New(ErrInvalidKey)
+	}
+	return errors.New(ErrInvalidKeyLength)
 }
