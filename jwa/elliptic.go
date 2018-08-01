@@ -77,6 +77,9 @@ func hashForAlg(message []byte, alg Algorithm) []byte {
 	return hash
 }
 
+//Each ECXXX algorithm has a curve assigned. If the key has a Curve with a name different that
+//the one defined in JWA (https://tools.ietf.org/html/rfc7518#section-3.1) then this function
+//returns an error with ErrInvalidCurve as message.
 func curveAndHashMatch(curveParams *elliptic.CurveParams, alg Algorithm) error {
 
 	var errText = ""
