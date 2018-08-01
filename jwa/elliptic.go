@@ -2,6 +2,7 @@ package jwa
 
 import (
 	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/sha256"
 	"crypto/sha512"
@@ -17,6 +18,11 @@ func EllipticSign(message, privateKey []byte, alg Algorithm) (r, s *big.Int, err
 
 	var pk *ecdsa.PrivateKey
 	if pk, err = x509.ParseECPrivateKey(privateKey); err != nil {
+		return zero, zero, err
+	}
+
+	//If the Algorithm doesn't match the curve, abort.
+	if err = curveAndHashMatch(pk.Curve.Params(), alg); err != nil {
 		return zero, zero, err
 	}
 
@@ -36,6 +42,12 @@ func EllipticVerify(message, publicKey []byte, r, s *big.Int, alg Algorithm) err
 	}
 
 	if pub, ok := pk.(*ecdsa.PublicKey); ok {
+
+		//If the Algorithm doesn't match the curve, abort.
+		if err = curveAndHashMatch(pub.Params(), alg); err != nil {
+			return err
+		}
+
 		hash := hashForAlg(message, alg)
 		if hash == nil {
 			return errors.New(ErrInvalidAlgorithm)
@@ -57,10 +69,36 @@ func hashForAlg(message []byte, alg Algorithm) []byte {
 		hash = sha256.New().Sum(message)
 	case EC384:
 		hash = sha512.New384().Sum(message)
-	case EC512:
+	case EC521:
 		hash = sha512.New().Sum(message)
 	default:
 		return nil
 	}
 	return hash
+}
+
+func curveAndHashMatch(curveParams *elliptic.CurveParams, alg Algorithm) error {
+
+	var errText = ""
+	switch alg {
+	case EC256:
+		if curveParams.Name != ECP256Name {
+			errText = ErrInvalidCurve
+		}
+	case EC384:
+		if curveParams.Name != ECP384Name {
+			errText = ErrInvalidCurve
+		}
+	case EC521:
+		if curveParams.Name != ECP521Name {
+			errText = ErrInvalidCurve
+		}
+	default:
+		errText = ErrInvalidAlgorithm
+	}
+
+	if errText == "" {
+		return nil
+	}
+	return errors.New(errText)
 }

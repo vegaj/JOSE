@@ -19,8 +19,8 @@ func NewOctetWriter(ECIdentifier string) (ECSignatureWriter, error) {
 		return ECSignatureWriter{Data: make([]byte, ECP256Octets, ECP256Octets), Index: 0}, nil
 	} else if ECIdentifier == ECP384Name {
 		return ECSignatureWriter{Data: make([]byte, ECP384Octets, ECP384Octets), Index: 0}, nil
-	} else if ECIdentifier == ECP512Name {
-		return ECSignatureWriter{Data: make([]byte, ECP512Octets, ECP512Octets), Index: 0}, nil
+	} else if ECIdentifier == ECP521Name {
+		return ECSignatureWriter{Data: make([]byte, ECP521Octets, ECP521Octets), Index: 0}, nil
 	}
 	return ECSignatureWriter{}, errors.New(ErrInvalidInput)
 }

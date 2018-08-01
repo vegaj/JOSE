@@ -12,6 +12,8 @@ var (
 	testDefaultMessage = []byte(`this is a default message to be signed and verified`)
 	testRSAPrivateKey  []byte
 	testRSAPublicKey   []byte
+	testECPublicKey    []byte
+	testECPrivateKey   []byte
 	testHMACKey        = randomBytes(16)
 )
 

@@ -31,8 +31,8 @@ const (
 	EC256
 	//EC384 is the code for elliptic curve P-384 usin SHA-384
 	EC384
-	//EC512 is the code for elliptic curve P-512 usin SHA-512
-	EC512
+	//EC521 is the code for elliptic curve P-521 usin SHA-512
+	EC521
 )
 
 const (
@@ -52,15 +52,15 @@ const (
 	ECP256Name = `P-256`
 	//ECP384Name identifier for Elliptic Curve P-256
 	ECP384Name = `P-384`
-	//ECP512Name identifier for Elliptic Curve P-512
-	ECP512Name = `P-512`
+	//ECP521Name identifier for Elliptic Curve P-521
+	ECP521Name = `P-521`
 
 	//ECP256Octets is the required space for signature serialization
 	ECP256Octets = 64
 	//ECP384Octets is the required space for signature seriaization
 	ECP384Octets = 96
-	//ECP512Octets is the required space for signature seriaization
-	ECP512Octets = 132
+	//ECP521Octets is the required space for signature seriaization
+	ECP521Octets = 132
 )
 
 const (
@@ -80,6 +80,9 @@ const (
 	ErrInvalidKey = `invalid key`
 	//ErrAlteredMessage means that the verification failed because the message was altered
 	ErrAlteredMessage = `altered message on verification`
+	//ErrInvalidCurve means that the given curve is not appropriate in this context.
+	//It could be because the curve is not recognized or because a different one was expected.
+	ErrInvalidCurve = `invalid curve`
 )
 
 //Signer interface
