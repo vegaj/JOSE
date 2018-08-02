@@ -94,13 +94,13 @@ func (o *ECSignatureWriter) Seek(offset int64, whence int) (int64, error) {
 	return position, nil
 }
 
-//WriteNumber will write the data encoded in binary.Little-Endian or binary.Big-Endian acording to order
-//As the signature is made out of two big integers, and the whole capacity must be filled, AddBytes
-func (o *ECSignatureWriter) WriteNumber(x *big.Int, order binary.ByteOrder) error {
+//WriteNumber will write the data encoded  binary.Big-Endian.
+//As the signature is made out of two big integers, and the whole capacity must be filled.
+func (o *ECSignatureWriter) WriteNumber(x *big.Int) error {
 	if x == nil {
 		return errors.New(ErrInvalidInput)
 	}
-	return binary.Write(o, order, fillBytes(x.Bytes(), cap(o.Data)/2))
+	return binary.Write(o, binary.BigEndian, fillBytes(x.Bytes(), cap(o.Data)/2))
 }
 
 //Reset sets the seeker to the start
@@ -111,7 +111,8 @@ func (o *ECSignatureWriter) Reset() {
 //Read implements io.Reader
 func (o *ECSignatureWriter) Read(p []byte) (int, error) {
 	rd := bytes.NewReader(p)
-	return rd.WriteTo(o)
+	err := binary.Read(rd, binary.BigEndian, o.Data)
+	return len(p), err
 }
 
 func fillBytes(src []byte, capacity int) []byte {

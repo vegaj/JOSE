@@ -2,10 +2,9 @@ package jws
 
 import (
 	"encoding/binary"
-	"errors"
 	"math/big"
 
-	"github.com/vegaj/jwt/jwa"
+	"github.com/vegaj/JOSE/jwa"
 )
 
 func ellipticSign(message []byte, sign jwa.Signer, alg jwa.Algorithm) (signature []byte, err error) {
@@ -31,7 +30,17 @@ func ellipticSign(message []byte, sign jwa.Signer, alg jwa.Algorithm) (signature
 	return ow.Data, nil
 }
 
-func ellipticVerify(message, signature []byte, verify jwa.Verifier, alg jwa.Algorithm) (bool, error) {
+func ellipticVerify(message, signature, publicKey []byte, alg jwa.Algorithm) error {
 	var r, s = big.NewInt(0), big.NewInt(0)
-	return false, errors.New("not implemented")
+
+	ow, _ := jwa.NewOctetWriter(alg)
+	if _, err := ow.Read(signature); err != nil {
+		return err
+	}
+
+	r.SetBytes(ow.Data[cap(ow.Data)/2:])
+	s.SetBytes(ow.Data[:cap(ow.Data)/2])
+
+	return jwa.EllipticVerify(message, publicKey, r, s, alg)
+
 }
