@@ -1,22 +1,17 @@
 package jwa
 
 import (
-	"crypto/ecdsa"
-	"crypto/rand"
-	"crypto/sha256"
-	"crypto/x509"
-	"encoding/binary"
-	"log"
-	"math/big"
-	rnd "math/rand"
+	"math/rand"
 )
 
 //Algorithm is the code to indicate wich algorithm you want to use
 type Algorithm uint
 
 const (
+	//UNSUP is the code for an unsupported algorithm
+	UNSUP Algorithm = iota
 	//HS256 is the code for HMAC using SHA-256
-	HS256 Algorithm = iota
+	HS256
 	//HS384 is the code for HMAC using SHA-384
 	HS384
 	//HS512 is the code for HMAC using SHA-512
@@ -100,67 +95,11 @@ type Signer interface{ SignWith() []byte }
 //Verifier interface
 type Verifier interface{ VerifyWith() []byte }
 
-//SignES256 Implement it in JSW
-func SignES256(message, serializedPrivateKey []byte) (signature []byte, err error) {
-
-	//Create Hash
-	hash := sha256.New().Sum(message)
-
-	//Sign with elliptic curve and private key
-	var r, s *big.Int
-	r, s, err = ECSignature(hash, serializedPrivateKey)
-	if err != nil {
-		return nil, err
-	}
-
-	//Create the token with the encoded form the returned r and s
-	ow, _ := NewOctetWriter(ECP256Name) //We ignore the error because we are using constants
-	if err := ow.WriteNumber(r, binary.BigEndian); err != nil {
-		return nil, err
-	}
-
-	if err := ow.WriteNumber(s, binary.BigEndian); err != nil {
-		return nil, err
-	}
-	signature = ow.Data
-	return signature, nil
-}
-
-//ECSignature Implement it in JSW
-func ECSignature(hash, serializedPrivateKey []byte) (r, s *big.Int, err error) {
-
-	zero := big.NewInt(0)
-	var privateKey *ecdsa.PrivateKey
-	if privateKey, err = x509.ParseECPrivateKey(serializedPrivateKey); err != nil {
-		return zero, zero, err
-	}
-
-	return ecdsa.Sign(rand.Reader, privateKey, hash)
-}
-
-//ECVerify Implement it in JWS
-func ECVerify(serializedPublicKey, hash []byte, r, s *big.Int) bool {
-
-	publicKey, err := x509.ParsePKIXPublicKey(serializedPublicKey)
-	if err != nil {
-		log.Println("EC Verify error <", err, ">")
-		return false
-	}
-
-	switch publicKey := publicKey.(type) {
-	case *ecdsa.PublicKey:
-		return ecdsa.Verify(publicKey, hash, r, s)
-	default:
-		log.Println("EC Verify : not a ecds public key")
-		return false
-	}
-}
-
 func randomBytes(len int) []byte {
 	data := make([]byte, len)
 
 	for i := 0; i < len; i++ {
-		data[i] = byte(rnd.Intn(8))
+		data[i] = byte(rand.Intn(8))
 	}
 	return data
 }

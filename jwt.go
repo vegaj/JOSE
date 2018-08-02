@@ -13,6 +13,11 @@ type Header struct {
 	So this struct is the base for the token manipulations.
 */
 type JWT struct {
-	Header  Header `json:"header"`
-	Payload Claims `json:"payload"`
+	Header    Header `json:"header"`
+	Payload   Claims `json:"payload"`
+	Signature []byte `json:"signature"`
+}
+
+func (jwt *JWT) Unmarshal(data []byte) error {
+
 }
