@@ -46,7 +46,7 @@ func (o *ECSignatureWriter) Write(p []byte) (n int, err error) {
 		return 0, errors.New(ErrNoSpace)
 	}
 
-	if int64(len(p)) > space {
+	if int64(len(p)) < space {
 		toWrite = int64(len(p))
 	}
 

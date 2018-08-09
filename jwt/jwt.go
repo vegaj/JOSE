@@ -29,6 +29,15 @@ func Deserialize(data []byte) (JWT, error) {
 	return JWT{}, errors.New("not implemented")
 }
 
+//NewJWT will create an empty JWT.
+func NewJWT() JWT {
+	return JWT{
+		Header:     make(map[string]interface{}),
+		Payload:    make(Claims),
+		Signatures: make([]Signature, 0),
+	}
+}
+
 //CompactSerialization will returns a serialization of the current jwt.
 //This serialization will be in the form of:
 //<HEADER>.<PAYLOAD> if it's a not signed JWT.

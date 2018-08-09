@@ -15,6 +15,16 @@ type Options struct {
 	PublicKey  []byte
 }
 
+//SignWith implements jwa.Signer
+func (opt Options) SignWith() []byte {
+	return opt.PrivateKey
+}
+
+//VerifyWith implements jwa.Verifier
+func (opt Options) VerifyWith() []byte {
+	return opt.PublicKey
+}
+
 //Sign will sign the input JWT according to opt.
 func Sign(j *jwt.JWT, opt Options) error {
 	j.Signatures = []jwt.Signature{
