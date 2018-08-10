@@ -7,31 +7,6 @@ import (
 	"github.com/vegaj/JOSE/jwa"
 )
 
-/*
-func ellipticSign(message []byte, opt *Options) (signature []byte, err error) {
-
-	r, s, err := jwa.EllipticSign(message, opt.SignWith(), opt.Algorithm)
-	if err != nil {
-		return nil, err
-	}
-
-	ow, err := jwa.NewOctetWriter(opt.Algorithm)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = ow.WriteNumber(r); err != nil {
-		return nil, err
-	}
-
-	if err = ow.WriteNumber(s); err != nil {
-		return nil, err
-	}
-
-	return ow.Data, nil
-}
-*/
-
 func ellipticSign(message []byte, opt *Options) (signature []byte, err error) {
 	r, s, err := jwa.EllipticSign(message, opt.SignWith(), opt.Algorithm)
 	if err != nil {
@@ -44,8 +19,8 @@ func ellipticSign(message []byte, opt *Options) (signature []byte, err error) {
 	}
 
 	var space = cap(signature) / 2
-	var lower = fillBytes(r.Bytes(), space)
-	var upper = fillBytes(s.Bytes(), space)
+	var lower = addPadding(r.Bytes(), space)
+	var upper = addPadding(s.Bytes(), space)
 	offsetWrite(signature, lower, 0)
 	offsetWrite(signature, upper, space)
 
@@ -79,18 +54,18 @@ func offsetWrite(dst, p []byte, offset int) (n int, err error) {
 
 func allocSignature(alg jwa.Algorithm) ([]byte, error) {
 	switch alg {
-	case jwa.EC256:
-		return make([]byte, jwa.ECP256Octets, jwa.ECP256Octets), nil
-	case jwa.EC384:
-		return make([]byte, jwa.ECP384Octets, jwa.ECP384Octets), nil
-	case jwa.EC521:
-		return make([]byte, jwa.ECP521Octets, jwa.ECP521Octets), nil
+	case jwa.ES256:
+		return make([]byte, jwa.ESP256Octets, jwa.ESP256Octets), nil
+	case jwa.ES384:
+		return make([]byte, jwa.ESP384Octets, jwa.ESP384Octets), nil
+	case jwa.ES512:
+		return make([]byte, jwa.ESP521Octets, jwa.ESP521Octets), nil
 	default:
 		return nil, errors.New(jwa.ErrInvalidAlgorithm)
 	}
 }
 
-func fillBytes(src []byte, capacity int) []byte {
+func addPadding(src []byte, capacity int) []byte {
 
 	data := make([]byte, capacity, capacity)
 	for i := 0; i < capacity; i++ {
@@ -106,18 +81,34 @@ func fillBytes(src []byte, capacity int) []byte {
 
 func ellipticVerify(message, signature []byte, opt *Options) (err error) {
 	r, s := big.NewInt(0), big.NewInt(0)
-	/*
-		ow, _ := jwa.NewOctetWriter(opt.Algorithm)
-		if _, err := ow.Read(signature); err != nil {
-			return err
-		}
-	*/
 
 	var space = cap(signature) / 2
-	r = r.SetBytes(signature[:space])
-	s = s.SetBytes(signature[space:])
+	r = r.SetBytes(removePadding(signature[:space]))
+	s = s.SetBytes(removePadding(signature[space:]))
 
 	err = jwa.EllipticVerify(message, opt.VerifyWith(), r, s, opt.Algorithm)
 	return err
 
+}
+
+func removePadding(p []byte) []byte {
+
+	if p == nil {
+		return nil
+	}
+
+	if len(p) == 0 {
+		return p
+	}
+
+	index := len(p)
+
+	for i := 0; i < len(p); i++ {
+		if p[len(p)-1-i] != 0 {
+			return p[:index]
+		}
+		index--
+	}
+
+	return p
 }
