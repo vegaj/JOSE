@@ -13,7 +13,7 @@ import (
 
 //Convertir test***Key de PrivateKey a []byte
 var (
-	testP224Key, testP224PubKey []byte
+	testP256Key, testP256PubKey []byte
 	testP384Key, testP384PubKey []byte
 	testP521Key, testP521PubKey []byte
 
@@ -27,8 +27,8 @@ var (
 
 func TestMain(m *testing.M) {
 	if pk, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader); err == nil {
-		testP224Key, _ = x509.MarshalECPrivateKey(pk)
-		testP224PubKey, _ = x509.MarshalPKIXPublicKey(&pk.PublicKey)
+		testP256Key, _ = x509.MarshalECPrivateKey(pk)
+		testP256PubKey, _ = x509.MarshalPKIXPublicKey(&pk.PublicKey)
 	}
 
 	if pk, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader); err == nil {

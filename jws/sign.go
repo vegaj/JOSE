@@ -1,6 +1,8 @@
 package jws
 
 import (
+	"crypto"
+	"crypto/x509"
 	"errors"
 
 	"github.com/vegaj/JOSE/jwa"
@@ -13,6 +15,63 @@ type Options struct {
 	Algorithm  jwa.Algorithm
 	PrivateKey []byte
 	PublicKey  []byte
+
+	prik crypto.PrivateKey
+	pubk crypto.PublicKey
+}
+
+//Private will try to parse the given PrivateKey.
+func (opt *Options) Private() (crypto.PrivateKey, error) {
+	if opt.prik == nil {
+		pk, err := unmarshalPrivate(opt.Algorithm, opt.PrivateKey)
+		if err != nil {
+			return nil, err
+		}
+		opt.prik = pk
+	}
+	return opt.prik, nil
+}
+
+//Public will try to parse the given VerificationKey.
+func (opt *Options) Public() (crypto.PublicKey, error) {
+	if opt.prik == nil {
+		pk, err := unmarshalPublic(opt.Algorithm, opt.PrivateKey)
+		if err != nil {
+			return nil, err
+		}
+		opt.pubk = pk
+	}
+	return opt.pubk, nil
+}
+
+func unmarshalPrivate(alg jwa.Algorithm, key []byte) (crypto.PrivateKey, error) {
+	switch alg {
+	case jwa.RS256, jwa.RS384, jwa.RS512:
+		return x509.ParsePKCS1PrivateKey(key)
+	case jwa.ES256, jwa.ES384, jwa.ES512:
+		return x509.ParseECPrivateKey(key)
+	case jwa.HS256, jwa.HS384, jwa.HS512:
+		return nil, errors.New(jwa.ErrInvalidKey)
+	default:
+		return nil, errors.New(jwa.ErrInvalidAlgorithm)
+	}
+}
+
+func unmarshalPublic(alg jwa.Algorithm, key []byte) (crypto.PublicKey, error) {
+	switch alg {
+	case jwa.RS256, jwa.RS384, jwa.RS512:
+		k, err := x509.ParsePKCS1PublicKey(key)
+		if err == nil {
+			return k, nil
+		}
+		return x509.ParsePKIXPublicKey(key)
+	case jwa.ES256, jwa.ES384, jwa.ES512:
+		return x509.ParsePKIXPublicKey(key)
+	case jwa.HS256, jwa.HS384, jwa.HS512:
+		return nil, errors.New(jwa.ErrInvalidKey)
+	default:
+		return nil, errors.New(jwa.ErrInvalidAlgorithm)
+	}
 }
 
 //SignWith implements jwa.Signer

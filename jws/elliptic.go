@@ -13,6 +13,7 @@ func ellipticSign(message []byte, opt *Options) (signature []byte, err error) {
 		return nil, err
 	}
 
+	//The err field will be nil because that check is already performed on jwa.EllipticSign
 	signature, err = allocSignature(opt.Algorithm)
 	if err != nil {
 		return nil, err
