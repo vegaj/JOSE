@@ -24,12 +24,12 @@ func Test_EC256_SignVerify(t *testing.T) {
 		t.Fatalf("Marshal public key: %v", err)
 	}
 
-	r, s, err := EllipticSign(testDefaultMessage, testECPrivateKey, EC256)
+	r, s, err := EllipticSign(testDefaultMessage, testECPrivateKey, ES256)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = EllipticVerify(testDefaultMessage, testECPublicKey, r, s, EC256); err != nil {
+	if err = EllipticVerify(testDefaultMessage, testECPublicKey, r, s, ES256); err != nil {
 		t.Fatal(err)
 	}
 
@@ -51,12 +51,12 @@ func Test_EC384_SignVerify(t *testing.T) {
 		t.Fatalf("Marshal public key: %v", err)
 	}
 
-	r, s, err := EllipticSign(testDefaultMessage, testECPrivateKey, EC384)
+	r, s, err := EllipticSign(testDefaultMessage, testECPrivateKey, ES384)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = EllipticVerify(testDefaultMessage, testECPublicKey, r, s, EC384); err != nil {
+	if err = EllipticVerify(testDefaultMessage, testECPublicKey, r, s, ES384); err != nil {
 		t.Fatal(err)
 	}
 
@@ -79,12 +79,12 @@ func Test_EC521_SignVerify(t *testing.T) {
 		t.Fatalf("Marshal public key: %v", err)
 	}
 
-	r, s, err := EllipticSign(testDefaultMessage, testECPrivateKey, EC521)
+	r, s, err := EllipticSign(testDefaultMessage, testECPrivateKey, ES512)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = EllipticVerify(testDefaultMessage, testECPublicKey, r, s, EC521); err != nil {
+	if err = EllipticVerify(testDefaultMessage, testECPublicKey, r, s, ES512); err != nil {
 		t.Fatal(err)
 	}
 
@@ -110,7 +110,7 @@ func Test_EC256_UsingGreaterCurve(t *testing.T) {
 		t.Fatalf("Marshal public key: %v", err)
 	}
 
-	r, s, err := EllipticSign(testDefaultMessage, testECPrivateKey, EC256)
+	r, s, err := EllipticSign(testDefaultMessage, testECPrivateKey, ES256)
 	if err == nil {
 		t.Fatalf("(Sign) nil error, but expecting <%s>", ErrInvalidCurve)
 	} else if err.Error() != ErrInvalidCurve {
@@ -118,7 +118,7 @@ func Test_EC256_UsingGreaterCurve(t *testing.T) {
 	}
 
 	//The signature is made out of r and s. So we need them to verify the message has not been altered.
-	if err = EllipticVerify(testDefaultMessage, testECPublicKey, r, s, EC256); err == nil {
+	if err = EllipticVerify(testDefaultMessage, testECPublicKey, r, s, ES256); err == nil {
 		t.Fatalf("(Verify) nil error, but expecting <%s>", ErrInvalidCurve)
 	} else if err.Error() != ErrInvalidCurve {
 		t.Errorf("Verification failed but it's due to <%s> instead of <%s>", err.Error(), ErrInvalidCurve)
@@ -142,13 +142,13 @@ func Test_EC521_UsingLowerCurve(t *testing.T) {
 		t.Fatalf("Marshal public key: %v", err)
 	}
 
-	r, s, err := EllipticSign(testDefaultMessage, testECPrivateKey, EC521)
+	r, s, err := EllipticSign(testDefaultMessage, testECPrivateKey, ES512)
 	if err != nil {
 		t.Fatalf("(Sign) Expected a failure because the curves are different, found <%v>", err)
 	}
 
 	//The signature is made out of r and s. So we need them to verify the message has not been altered.
-	if err = EllipticVerify(testDefaultMessage, testECPublicKey, r, s, EC521); err != nil {
+	if err = EllipticVerify(testDefaultMessage, testECPublicKey, r, s, ES512); err != nil {
 		t.Fatalf("(Verify) Expected a failure because the curves are different, found <%v>", err)
 	}
 

@@ -4,12 +4,12 @@ package jwa
 //as described here: https://tools.ietf.org/html/rfc7518#section-3.1
 func GetAlgorithmName(alg Algorithm) string {
 	switch alg {
-	case EC256:
-		return ECP256Name
-	case EC384:
-		return ECP384Name
-	case EC521:
-		return ECP521Name
+	case ES256:
+		return ES256Name
+	case ES384:
+		return ES384Name
+	case ES512:
+		return ES512Name
 	case RS256:
 		return RS256Name
 	case RS384:
@@ -30,12 +30,12 @@ func GetAlgorithmName(alg Algorithm) string {
 //AlgorithmFromName returns the algorithm associated with the input algorithm name.
 func AlgorithmFromName(name string) Algorithm {
 	switch name {
-	case ECP256Name:
-		return EC256
-	case ECP384Name:
-		return EC384
-	case ECP521Name:
-		return EC521
+	case ES256Name:
+		return ES256
+	case ES384Name:
+		return ES384
+	case ES512Name:
+		return ES512
 	case RS256Name:
 		return RS256
 	case RS384Name:

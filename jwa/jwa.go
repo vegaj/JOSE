@@ -22,12 +22,12 @@ const (
 	RS384
 	//RS512 is the code for RSA using SHA-512
 	RS512
-	//EC256 is the code for elliptic curve P-256 usin SHA-256
-	EC256
-	//EC384 is the code for elliptic curve P-384 usin SHA-384
-	EC384
-	//EC521 is the code for elliptic curve P-521 usin SHA-512
-	EC521
+	//ES256 is the code for elliptic curve P-256 usin SHA-256
+	ES256
+	//ES384 is the code for elliptic curve P-384 usin SHA-384
+	ES384
+	//ES512 is the code for elliptic curve P-521 usin SHA-512
+	ES512
 )
 
 const (
@@ -43,19 +43,27 @@ const (
 	RS384Name = `RS384`
 	//RS512Name signature with RSASSA-PKCS1-v1_5 using SHA-512
 	RS512Name = `RS512`
+
+	//ES256Name signature with the elliptic curve P-256 using SHA-256
+	ES256Name = `EC256`
+	//ES384Name signature with the elliptic curve P-384 using SHA-384
+	ES384Name = `EC384`
+	//ES512Name signature with the elliptic curve P-521 using SHA-512
+	ES512Name = `EC512`
+
+	//ESP256Octets is the required space for signature serialization
+	ESP256Octets = 64
+	//ESP384Octets is the required space for signature seriaization
+	ESP384Octets = 96
+	//ESP521Octets is the required space for signature seriaization
+	ESP521Octets = 132
+
 	//ECP256Name identifier for Elliptic Curve P-256
 	ECP256Name = `P-256`
 	//ECP384Name identifier for Elliptic Curve P-256
 	ECP384Name = `P-384`
 	//ECP521Name identifier for Elliptic Curve P-521
 	ECP521Name = `P-521`
-
-	//ECP256Octets is the required space for signature serialization
-	ECP256Octets = 64
-	//ECP384Octets is the required space for signature seriaization
-	ECP384Octets = 96
-	//ECP521Octets is the required space for signature seriaization
-	ECP521Octets = 132
 )
 
 const (

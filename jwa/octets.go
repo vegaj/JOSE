@@ -8,32 +8,32 @@ import (
 	"math/big"
 )
 
-//ECSignatureWriter is a io.WriteSeeker
-type ECSignatureWriter struct {
+//ESSignatureWriter is a io.WriteSeeker
+type ESSignatureWriter struct {
 	Data  []byte
 	Index int64
 }
 
 //NewOctetWriter returns the valid writer for the P-256 Sha-256 digital signature generation
-func NewOctetWriter(ECIdentifier Algorithm) (ECSignatureWriter, error) {
-	if ECIdentifier == EC256 {
-		return ECSignatureWriter{Data: make([]byte, ECP256Octets, ECP256Octets), Index: 0}, nil
-	} else if ECIdentifier == EC384 {
-		return ECSignatureWriter{Data: make([]byte, ECP384Octets, ECP384Octets), Index: 0}, nil
-	} else if ECIdentifier == EC521 {
-		return ECSignatureWriter{Data: make([]byte, ECP521Octets, ECP521Octets), Index: 0}, nil
+func NewOctetWriter(ESIdentifier Algorithm) (ESSignatureWriter, error) {
+	if ESIdentifier == ES256 {
+		return ESSignatureWriter{Data: make([]byte, ESP256Octets, ESP256Octets), Index: 0}, nil
+	} else if ESIdentifier == ES384 {
+		return ESSignatureWriter{Data: make([]byte, ESP384Octets, ESP384Octets), Index: 0}, nil
+	} else if ESIdentifier == ES512 {
+		return ESSignatureWriter{Data: make([]byte, ESP521Octets, ESP521Octets), Index: 0}, nil
 	}
-	return ECSignatureWriter{}, errors.New(ErrInvalidAlgorithm)
+	return ESSignatureWriter{}, errors.New(ErrInvalidAlgorithm)
 }
 
 //RemainingSpace is the number of bytes that can be written into this writer.
-func (o ECSignatureWriter) RemainingSpace() int64 {
+func (o ESSignatureWriter) RemainingSpace() int64 {
 	return int64(cap(o.Data)) - o.Index
 }
 
 //Write up to the remaining space inside OctectWriter from p.
 //If p has more space than the remaining inside
-func (o *ECSignatureWriter) Write(p []byte) (n int, err error) {
+func (o *ESSignatureWriter) Write(p []byte) (n int, err error) {
 
 	var space = o.RemainingSpace()
 	var toWrite = space
@@ -69,7 +69,7 @@ Seek returns the new offset relative to the start of the file and an error, if a
 Seeking to an offset before the start of the file is an error.
 Seeking to any positive offset is legal, and will be set to
 */
-func (o *ECSignatureWriter) Seek(offset int64, whence int) (int64, error) {
+func (o *ESSignatureWriter) Seek(offset int64, whence int) (int64, error) {
 
 	if offset < 0 {
 		return int64(o.Index), errors.New(ErrIllegalIndex)
@@ -96,7 +96,7 @@ func (o *ECSignatureWriter) Seek(offset int64, whence int) (int64, error) {
 
 //WriteNumber will write the data encoded  binary.Big-Endian.
 //As the signature is made out of two big integers, and the whole capacity must be filled.
-func (o *ECSignatureWriter) WriteNumber(x *big.Int) error {
+func (o *ESSignatureWriter) WriteNumber(x *big.Int) error {
 	if x == nil {
 		return errors.New(ErrInvalidInput)
 	}
@@ -104,12 +104,12 @@ func (o *ECSignatureWriter) WriteNumber(x *big.Int) error {
 }
 
 //Reset sets the seeker to the start
-func (o *ECSignatureWriter) Reset() {
+func (o *ESSignatureWriter) Reset() {
 	o.Index = 0
 }
 
 //Read implements io.Reader
-func (o *ECSignatureWriter) Read(p []byte) (int, error) {
+func (o *ESSignatureWriter) Read(p []byte) (int, error) {
 	rd := bytes.NewReader(p)
 	err := binary.Read(rd, binary.BigEndian, o.Data)
 	return len(p), err
