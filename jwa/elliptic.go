@@ -1,12 +1,12 @@
 package jwa
 
 import (
+	"crypto"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/sha256"
 	"crypto/sha512"
-	"crypto/x509"
 	"errors"
 	"hash"
 	"math/big"
@@ -15,11 +15,17 @@ import (
 var zero = big.NewInt(0)
 
 //EllipticSign using ESXXX algorithms.
-func EllipticSign(message, privateKey []byte, alg Algorithm) (r, s *big.Int, err error) {
+func EllipticSign(message []byte, priv crypto.PrivateKey, alg Algorithm) (r, s *big.Int, err error) {
 
 	var pk *ecdsa.PrivateKey
-	if pk, err = x509.ParseECPrivateKey(privateKey); err != nil {
+	/*if pk, err = x509.ParseECPrivateKey(privateKey); err != nil {
 		return zero, zero, err
+	}
+	*/
+
+	var ok bool
+	if pk, ok = priv.(*ecdsa.PrivateKey); !ok {
+		return zero, zero, errors.New(ErrInvalidKey)
 	}
 
 	//If the Algorithm doesn't match the curve, abort.
@@ -36,13 +42,16 @@ func EllipticSign(message, privateKey []byte, alg Algorithm) (r, s *big.Int, err
 }
 
 //EllipticVerify for the ESXXX digital signature algorithms. error = nil means Verification correct.
-func EllipticVerify(message, publicKey []byte, r, s *big.Int, alg Algorithm) error {
-	pk, err := x509.ParsePKIXPublicKey(publicKey)
-	if err != nil {
-		return err
-	}
+func EllipticVerify(message []byte, publicKey crypto.PublicKey, r, s *big.Int, alg Algorithm) error {
 
-	if pub, ok := pk.(*ecdsa.PublicKey); ok {
+	/*
+		pk, err := x509.ParsePKIXPublicKey(publicKey)
+		if err != nil {
+			return err
+		}
+	*/
+	var err error
+	if pub, ok := publicKey.(*ecdsa.PublicKey); ok {
 
 		//If the Algorithm doesn't match the curve, abort.
 		if err = curveAndHashMatch(pub.Params(), alg); err != nil {

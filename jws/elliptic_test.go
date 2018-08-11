@@ -110,7 +110,7 @@ func Test_ECS_WithNoECAlgorithm(t *testing.T) {
 	opt := &Options{
 		Algorithm:  jwa.RS256,
 		PrivateKey: testP256Key,
-		PublicKey:  testP256Key,
+		PublicKey:  testP256PubKey,
 		SignID:     "fail-id",
 	}
 
@@ -118,8 +118,8 @@ func Test_ECS_WithNoECAlgorithm(t *testing.T) {
 	_, err := ellipticSign(message, opt)
 	if err == nil {
 		t.Errorf("Error not detected")
-	} else if err.Error() != jwa.ErrInvalidAlgorithm {
-		t.Errorf("Expected error: %s, found %v", jwa.ErrInvalidAlgorithm, err)
+	} else if err.Error() != jwa.ErrInvalidKeyForAlgorithm {
+		t.Errorf("Expected error: %s, found %v", jwa.ErrInvalidKeyForAlgorithm, err)
 	}
 }
 
@@ -175,8 +175,8 @@ func Test_ECS_VerifyInvalidAlg(t *testing.T) {
 	err = ellipticVerify(message, sig, opt)
 	if err == nil {
 		t.Error("Error undetected")
-	} else if err.Error() != jwa.ErrInvalidAlgorithm {
-		t.Errorf("Expected %s, found  %v", jwa.ErrInvalidAlgorithm, err)
+	} else if err.Error() != jwa.ErrInvalidKeyForAlgorithm {
+		t.Errorf("Expected %s, found  %v", jwa.ErrInvalidKeyForAlgorithm, err)
 	}
 
 }
@@ -235,7 +235,7 @@ func Test_ECS_BadAlgGoodKeys(t *testing.T) {
 
 	if err == nil {
 		t.Error("undetected error")
-	} else if err.Error() != jwa.ErrInvalidAlgorithm {
-		t.Errorf("%s - %v", jwa.ErrInvalidAlgorithm, err)
+	} else if err.Error() != jwa.ErrInvalidKeyForAlgorithm {
+		t.Errorf("%s - %v", jwa.ErrInvalidKeyForAlgorithm, err)
 	}
 }

@@ -8,7 +8,13 @@ import (
 )
 
 func ellipticSign(message []byte, opt *Options) (signature []byte, err error) {
-	r, s, err := jwa.EllipticSign(message, opt.SignWith(), opt.Algorithm)
+
+	priv, err := opt.Private()
+	if err != nil {
+		return nil, err
+	}
+
+	r, s, err := jwa.EllipticSign(message, priv, opt.Algorithm)
 	if err != nil {
 		return nil, err
 	}
@@ -26,6 +32,23 @@ func ellipticSign(message []byte, opt *Options) (signature []byte, err error) {
 	offsetWrite(signature, upper, space)
 
 	return signature, nil
+}
+
+func ellipticVerify(message, signature []byte, opt *Options) (err error) {
+	r, s := big.NewInt(0), big.NewInt(0)
+
+	var space = cap(signature) / 2
+	r = r.SetBytes(removePadding(signature[:space]))
+	s = s.SetBytes(removePadding(signature[space:]))
+
+	pub, err := opt.Public()
+	if err != nil {
+		return err
+	}
+
+	err = jwa.EllipticVerify(message, pub, r, s, opt.Algorithm)
+	return err
+
 }
 
 func offsetWrite(dst, p []byte, offset int) (n int, err error) {
@@ -78,18 +101,6 @@ func addPadding(src []byte, capacity int) []byte {
 	}
 
 	return data
-}
-
-func ellipticVerify(message, signature []byte, opt *Options) (err error) {
-	r, s := big.NewInt(0), big.NewInt(0)
-
-	var space = cap(signature) / 2
-	r = r.SetBytes(removePadding(signature[:space]))
-	s = s.SetBytes(removePadding(signature[space:]))
-
-	err = jwa.EllipticVerify(message, opt.VerifyWith(), r, s, opt.Algorithm)
-	return err
-
 }
 
 func removePadding(p []byte) []byte {

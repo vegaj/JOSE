@@ -25,7 +25,7 @@ func (opt *Options) Private() (crypto.PrivateKey, error) {
 	if opt.prik == nil {
 		pk, err := unmarshalPrivate(opt.Algorithm, opt.PrivateKey)
 		if err != nil {
-			return nil, err
+			return nil, errors.New(jwa.ErrInvalidKeyForAlgorithm)
 		}
 		opt.prik = pk
 	}
@@ -34,10 +34,10 @@ func (opt *Options) Private() (crypto.PrivateKey, error) {
 
 //Public will try to parse the given VerificationKey.
 func (opt *Options) Public() (crypto.PublicKey, error) {
-	if opt.prik == nil {
-		pk, err := unmarshalPublic(opt.Algorithm, opt.PrivateKey)
+	if opt.pubk == nil {
+		pk, err := unmarshalPublic(opt.Algorithm, opt.PublicKey)
 		if err != nil {
-			return nil, err
+			return nil, errors.New(jwa.ErrInvalidKeyForAlgorithm)
 		}
 		opt.pubk = pk
 	}
@@ -60,11 +60,7 @@ func unmarshalPrivate(alg jwa.Algorithm, key []byte) (crypto.PrivateKey, error) 
 func unmarshalPublic(alg jwa.Algorithm, key []byte) (crypto.PublicKey, error) {
 	switch alg {
 	case jwa.RS256, jwa.RS384, jwa.RS512:
-		k, err := x509.ParsePKCS1PublicKey(key)
-		if err == nil {
-			return k, nil
-		}
-		return x509.ParsePKIXPublicKey(key)
+		return x509.ParsePKCS1PublicKey(key)
 	case jwa.ES256, jwa.ES384, jwa.ES512:
 		return x509.ParsePKIXPublicKey(key)
 	case jwa.HS256, jwa.HS384, jwa.HS512:
@@ -75,12 +71,12 @@ func unmarshalPublic(alg jwa.Algorithm, key []byte) (crypto.PublicKey, error) {
 }
 
 //SignWith implements jwa.Signer
-func (opt Options) SignWith() []byte {
+func (opt *Options) SignWith() []byte {
 	return opt.PrivateKey
 }
 
 //VerifyWith implements jwa.Verifier
-func (opt Options) VerifyWith() []byte {
+func (opt *Options) VerifyWith() []byte {
 	return opt.PublicKey
 }
 

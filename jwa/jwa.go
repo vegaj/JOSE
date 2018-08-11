@@ -88,6 +88,8 @@ const (
 	ErrInvalidCurve = `invalid curve`
 	//ErrInvalidKeyLength means that the used key has an invalid size.
 	ErrInvalidKeyLength = `invalid key length`
+	//ErrInvalidKeyForAlgorithm means that the key is not the expected for the algorithm that is supposed to use it.
+	ErrInvalidKeyForAlgorithm = `key not suitable for the given algorithm`
 )
 
 const (
