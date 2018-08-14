@@ -4,25 +4,17 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"crypto/x509"
 	"testing"
 )
 
 func Test_EC256_SignVerify(t *testing.T) {
 
 	var err error
-	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	testECPrivateKey, err = ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		t.Fatalf("Generate ECKey 256: %v", err)
 	}
-
-	if testECPrivateKey, err = x509.MarshalECPrivateKey(priv); err != nil {
-		t.Fatalf("Marshal private key: %v", err)
-	}
-
-	if testECPublicKey, err = x509.MarshalPKIXPublicKey(&priv.PublicKey); err != nil {
-		t.Fatalf("Marshal public key: %v", err)
-	}
+	testECPublicKey = &testECPrivateKey.PublicKey
 
 	r, s, err := EllipticSign(testDefaultMessage, testECPrivateKey, ES256)
 	if err != nil {
@@ -38,18 +30,11 @@ func Test_EC256_SignVerify(t *testing.T) {
 func Test_EC384_SignVerify(t *testing.T) {
 
 	var err error
-	priv, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
+	testECPrivateKey, err = ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
 	if err != nil {
 		t.Fatalf("Generate ECKey 384: %v", err)
 	}
-
-	if testECPrivateKey, err = x509.MarshalECPrivateKey(priv); err != nil {
-		t.Fatalf("Marshal private key: %v", err)
-	}
-
-	if testECPublicKey, err = x509.MarshalPKIXPublicKey(&priv.PublicKey); err != nil {
-		t.Fatalf("Marshal public key: %v", err)
-	}
+	testECPublicKey = &testECPrivateKey.PublicKey
 
 	r, s, err := EllipticSign(testDefaultMessage, testECPrivateKey, ES384)
 	if err != nil {
@@ -65,19 +50,11 @@ func Test_EC384_SignVerify(t *testing.T) {
 func Test_EC521_SignVerify(t *testing.T) {
 
 	var err error
-	priv, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
+	testECPrivateKey, err = ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	if err != nil {
 		t.Fatalf("Generate ECKey 521: %v", err)
 	}
-
-	if testECPrivateKey, err = x509.MarshalECPrivateKey(priv); err != nil {
-		t.Fatalf("Marshal private key: %v", err)
-	}
-
-	pub := &priv.PublicKey
-	if testECPublicKey, err = x509.MarshalPKIXPublicKey(pub); err != nil {
-		t.Fatalf("Marshal public key: %v", err)
-	}
+	testECPublicKey = &testECPrivateKey.PublicKey
 
 	r, s, err := EllipticSign(testDefaultMessage, testECPrivateKey, ES512)
 	if err != nil {
@@ -97,18 +74,11 @@ func Test_EC521_SignVerify(t *testing.T) {
 func Test_EC256_UsingGreaterCurve(t *testing.T) {
 
 	var err error
-	priv, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
+	testECPrivateKey, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
 	if err != nil {
 		t.Fatalf("Generate ECKey 384: %v", err)
 	}
-
-	if testECPrivateKey, err = x509.MarshalECPrivateKey(priv); err != nil {
-		t.Fatalf("Marshal private key: %v", err)
-	}
-
-	if testECPublicKey, err = x509.MarshalPKIXPublicKey(&priv.PublicKey); err != nil {
-		t.Fatalf("Marshal public key: %v", err)
-	}
+	testECPublicKey = &testECPrivateKey.PublicKey
 
 	r, s, err := EllipticSign(testDefaultMessage, testECPrivateKey, ES256)
 	if err == nil {
@@ -129,18 +99,11 @@ func Test_EC256_UsingGreaterCurve(t *testing.T) {
 func Test_EC521_UsingLowerCurve(t *testing.T) {
 
 	var err error
-	priv, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
+	testECPrivateKey, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
 	if err != nil {
 		t.Fatalf("Generate ECKey 384: %v", err)
 	}
-
-	if testECPrivateKey, err = x509.MarshalECPrivateKey(priv); err != nil {
-		t.Fatalf("Marshal private key: %v", err)
-	}
-
-	if testECPublicKey, err = x509.MarshalPKIXPublicKey(&priv.PublicKey); err != nil {
-		t.Fatalf("Marshal public key: %v", err)
-	}
+	testECPublicKey = &testECPrivateKey.PublicKey
 
 	r, s, err := EllipticSign(testDefaultMessage, testECPrivateKey, ES512)
 	if err != nil {

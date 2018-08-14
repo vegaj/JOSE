@@ -3,7 +3,6 @@ package jwa
 import (
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/x509"
 	"testing"
 )
 
@@ -14,8 +13,8 @@ func Test_RSA_CompleteProcedure(t *testing.T) {
 		panic(err)
 	}
 
-	privateKey := x509.MarshalPKCS1PrivateKey(pk)
-	publicKey := x509.MarshalPKCS1PublicKey(&pk.PublicKey)
+	privateKey := pk
+	publicKey := &pk.PublicKey
 
 	message := []byte("Fido is my friend. Poor fido.")
 	signature, err := RSASign(message, privateKey, RS256)
@@ -77,17 +76,14 @@ func Test_RSA_EnsureKeyLength(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	smallPrivate := x509.MarshalPKCS1PrivateKey(smallKey)
-	smallPublic := x509.MarshalPKCS1PublicKey(&smallKey.PublicKey)
-
-	signature, err := RSASign(testDefaultMessage, smallPrivate, RS256)
+	signature, err := RSASign(testDefaultMessage, smallKey, RS256)
 	if err == nil {
 		t.Fatalf("Expected error due to key smaller than 2048 bits.")
 	} else if err.Error() != ErrInvalidKeyLength {
 		t.Fatalf("Encountered error, but not the expected one: %v, found: %v", ErrInvalidKeyLength, err)
 	}
 
-	err = RSAVerify(testDefaultMessage, signature, smallPublic, RS256)
+	err = RSAVerify(testDefaultMessage, signature, &smallKey.PublicKey, RS256)
 	if err == nil {
 		t.Fatalf("Expected error due to key smaller than 2048 bits.")
 	} else if err.Error() != ErrInvalidKeyLength {

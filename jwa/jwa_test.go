@@ -1,19 +1,19 @@
 package jwa
 
 import (
+	"crypto/ecdsa"
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/x509"
 	"os"
 	"testing"
 )
 
 var (
 	testDefaultMessage = []byte(`this is a default message to be signed and verified`)
-	testRSAPrivateKey  []byte
-	testRSAPublicKey   []byte
-	testECPublicKey    []byte
-	testECPrivateKey   []byte
+	testRSAPrivateKey  *rsa.PrivateKey
+	testRSAPublicKey   *rsa.PublicKey
+	testECPublicKey    *ecdsa.PublicKey
+	testECPrivateKey   *ecdsa.PrivateKey
 	testHMACKey        = randomBytes(16)
 )
 
@@ -24,8 +24,8 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	testRSAPrivateKey = x509.MarshalPKCS1PrivateKey(pk)
-	testRSAPublicKey = x509.MarshalPKCS1PublicKey(&pk.PublicKey)
+	testRSAPrivateKey = pk
+	testRSAPublicKey = &pk.PublicKey
 
 	os.Exit(m.Run())
 }

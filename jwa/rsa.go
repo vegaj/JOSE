@@ -6,17 +6,16 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/sha512"
-	"crypto/x509"
 	"errors"
 	"hash"
 )
 
 //RSASign signature using the hashing algorithm hashAlg with the given private key.
-func RSASign(message, privateKey []byte, alg Algorithm) ([]byte, error) {
-
-	priv, err := x509.ParsePKCS1PrivateKey(privateKey)
-	if err != nil {
-		return nil, err
+func RSASign(message []byte, privateKey crypto.PrivateKey, alg Algorithm) ([]byte, error) {
+	var err error
+	priv, ok := privateKey.(*rsa.PrivateKey)
+	if !ok {
+		return nil, errors.New(ErrInvalidKey)
 	}
 
 	if err = rsaCheckKeyLen(priv); err != nil {
@@ -35,14 +34,22 @@ func RSASign(message, privateKey []byte, alg Algorithm) ([]byte, error) {
 }
 
 //RSAVerify will return nil if the message with the public key with the hash algorithm generates the given signature.
-func RSAVerify(message, signature, publicKey []byte, alg Algorithm) error {
+func RSAVerify(message, signature []byte, publicKey crypto.PublicKey, alg Algorithm) error {
 
 	var hash = translateAlgorithm(alg)
+	var err error
 
-	pub, err := x509.ParsePKCS1PublicKey(publicKey)
-	if err != nil {
-		return err
+	pub, ok := publicKey.(*rsa.PublicKey)
+	if !ok {
+		return errors.New(ErrInvalidKey)
 	}
+
+	/*
+		pub, err := x509.ParsePKCS1PublicKey(publicKey)
+		if err != nil {
+			return err
+		}
+	*/
 
 	if err = rsaCheckKeyLen(pub); err != nil {
 		return err
