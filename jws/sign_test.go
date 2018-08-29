@@ -121,6 +121,7 @@ func Test_JWS_ES521(t *testing.T) {
 		t.Error(err)
 	}
 }
+<<<<<<< HEAD
 
 func Test_JWS_RSA256(t *testing.T) {
 	var opt = &Options{
@@ -193,6 +194,25 @@ func Test_JWS_SameSignID(t *testing.T) {
 	//As there are two signatures with the same id, the first match is taken into consideration.
 	//So the one signed with opt can be verified meanwhile the one with opt2 cannot.
 	if err := Sign(token, opt2); err != nil {
+=======
+
+func Test_JWS_RSA256(t *testing.T) {
+	var opt = &Options{
+		Algorithm:  jwa.RS256,
+		PrivateKey: testRSAKey,
+		PublicKey:  testRSAPubKey,
+		SignID:     "pepe-rsa",
+	}
+
+	var token = jwt.NewJWT()
+	token.SetIssuer("pepe")
+
+	if err := Sign(token, opt); err != nil {
+		t.Error(err)
+	}
+
+	if err := Verify(token, opt); err != nil {
+>>>>>>> 05f152f6088bb3a68074afb5bcacc18ccc6b3547
 		t.Error(err)
 	}
 	if err := Verify(token, opt); err != nil {
