@@ -113,7 +113,7 @@ func Sign(j *jwt.JWT, opt *Options) error {
 
 	var protected, encodedSignature string
 
-	//protectedHeaderJSON, err := json.Marshal(signature.Header)
+	protectedHeaderJSON, err := json.Marshal(signature.Header)
 	if err != nil {
 		return err
 	}
@@ -128,16 +128,28 @@ func Sign(j *jwt.JWT, opt *Options) error {
 			return err
 		}
 
-		/*prot, err := EllipticSign(protectedHeaderJSON, opt)
+		prot, err := EllipticSign(protectedHeaderJSON, opt)
 		if err != nil {
 			return err
-		}*/
+		}
 
-		//protected = b64.EncodeURL(prot)
+		protected = b64.EncodeURL(prot)
 		encodedSignature = b64.EncodeURL(sig)
 
 	case jwa.RS256, jwa.RS384, jwa.RS512:
 		//Perform RSA signature.
+		sig, err := rsaSignature(message, opt)
+		if err != nil {
+			return err
+		}
+
+		prot, err := rsaSignature(protectedHeaderJSON, opt)
+		if err != nil {
+			return err
+		}
+
+		protected = b64.EncodeURL(prot)
+		encodedSignature = b64.EncodeURL(sig)
 	default:
 		return errors.New(jwa.ErrInvalidAlgorithm)
 	}
@@ -154,7 +166,7 @@ func Verify(j *jwt.JWT, opt *Options) error {
 
 	var err error
 	var signature jwt.Signature
-	//var signatureHeaderJSON []byte
+	var signatureHeaderJSON []byte
 
 	signature, err = findTargetSignature(j.Signatures, opt)
 
@@ -167,9 +179,7 @@ func Verify(j *jwt.JWT, opt *Options) error {
 		return err
 	}
 
-	log.Printf("Verification Message:  %s\n", string(message))
-
-	///var protected = b64.DecodeURL(signature.Protected)
+	var protected = b64.DecodeURL(signature.Protected)
 	var sign = b64.DecodeURL(signature.Signature)
 
 	//Header makes sense
@@ -177,10 +187,10 @@ func Verify(j *jwt.JWT, opt *Options) error {
 		return err
 	}
 
-	/*if signatureHeaderJSON, err = json.Marshal(signature.Header); err != nil {
+	if signatureHeaderJSON, err = json.Marshal(signature.Header); err != nil {
 		return err
 	}
-	*/
+
 	switch opt.Algorithm {
 	case jwa.HS256, jwa.HS384, jwa.HS512:
 		return errors.New("unimplemented")
@@ -190,8 +200,20 @@ func Verify(j *jwt.JWT, opt *Options) error {
 			return err
 		}
 
+		if err = EllipticVerify(signatureHeaderJSON, protected, opt); err != nil {
+			return err
+		}
+
 	case jwa.RS256, jwa.RS384, jwa.RS512:
-		//Perform RSA verification.
+
+		if err = rsaVerify(message, sign, opt); err != nil {
+			return err
+		}
+
+		if err = rsaVerify(signatureHeaderJSON, protected, opt); err != nil {
+			return err
+		}
+
 	default:
 		return errors.New(jwa.ErrInvalidAlgorithm)
 	}
@@ -209,9 +231,6 @@ func createMessage(j *jwt.JWT) ([]byte, error) {
 	if payloadJSON, err = json.Marshal(j.Payload); err != nil {
 		return nil, err
 	}
-
-	log.Printf("header json: %s\n", string(headerJSON))
-	log.Printf("payload json: %s\n", string(payloadJSON))
 
 	return []byte(b64.EncodeURL(headerJSON) + "." + b64.EncodeURL(payloadJSON)), nil
 }
