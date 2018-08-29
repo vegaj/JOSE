@@ -7,7 +7,8 @@ import (
 	"github.com/vegaj/JOSE/jwa"
 )
 
-func ellipticSign(message []byte, opt *Options) (signature []byte, err error) {
+//EllipticSign will perform the signature of message with the given options
+func EllipticSign(message []byte, opt *Options) (signature []byte, err error) {
 
 	priv, err := opt.Private()
 	if err != nil {
@@ -34,7 +35,8 @@ func ellipticSign(message []byte, opt *Options) (signature []byte, err error) {
 	return signature, nil
 }
 
-func ellipticVerify(message, signature []byte, opt *Options) (err error) {
+//EllipticVerify will verify that message with signed with options produces the signature
+func EllipticVerify(message, signature []byte, opt *Options) (err error) {
 	r, s := big.NewInt(0), big.NewInt(0)
 
 	var space = cap(signature) / 2

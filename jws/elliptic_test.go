@@ -54,12 +54,12 @@ func Test_ECS_SignVerification(t *testing.T) {
 		SignID:     "my-id",
 	}
 	var msg = []byte("this is my message. What were you expecting, a real jws?")
-	signature, err := ellipticSign(msg, &opt)
+	signature, err := EllipticSign(msg, &opt)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = ellipticVerify(msg, signature, &opt); err != nil {
+	if err = EllipticVerify(msg, signature, &opt); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -67,12 +67,12 @@ func Test_ECS_SignVerification(t *testing.T) {
 func Test_P256_Basic(t *testing.T) {
 	message := []byte("this is my message")
 	opt := &Options{Algorithm: jwa.ES256, PrivateKey: testP256Key, PublicKey: testP256PubKey, SignID: "this-id"}
-	sig, err := ellipticSign(message, opt)
+	sig, err := EllipticSign(message, opt)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = ellipticVerify(message, sig, opt); err != nil {
+	if err = EllipticVerify(message, sig, opt); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -80,12 +80,12 @@ func Test_P256_Basic(t *testing.T) {
 func Test_P384_Basic(t *testing.T) {
 	message := []byte("this is my message")
 	opt := &Options{Algorithm: jwa.ES384, PrivateKey: testP384Key, PublicKey: testP384PubKey, SignID: "this-id"}
-	sig, err := ellipticSign(message, opt)
+	sig, err := EllipticSign(message, opt)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = ellipticVerify(message, sig, opt); err != nil {
+	if err = EllipticVerify(message, sig, opt); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -93,12 +93,12 @@ func Test_P384_Basic(t *testing.T) {
 func Test_P521_Basic(t *testing.T) {
 	message := []byte("this is my message")
 	opt := &Options{Algorithm: jwa.ES512, PrivateKey: testP521Key, PublicKey: testP521PubKey, SignID: "this-id"}
-	sig, err := ellipticSign(message, opt)
+	sig, err := EllipticSign(message, opt)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = ellipticVerify(message, sig, opt); err != nil {
+	if err = EllipticVerify(message, sig, opt); err != nil {
 		t.Error(err)
 	}
 
@@ -115,7 +115,7 @@ func Test_ECS_WithNoECAlgorithm(t *testing.T) {
 	}
 
 	message := []byte("this is my message")
-	_, err := ellipticSign(message, opt)
+	_, err := EllipticSign(message, opt)
 	if err == nil {
 		t.Errorf("Error not detected")
 	} else if err.Error() != jwa.ErrInvalidKey {
@@ -132,7 +132,7 @@ func Test_ECS_InvalidAlgorithmKeyPair(t *testing.T) {
 	}
 
 	message := []byte("this is my message")
-	_, err := ellipticSign(message, opt)
+	_, err := EllipticSign(message, opt)
 	if err == nil {
 		t.Errorf("Error not detected")
 	}
@@ -147,7 +147,7 @@ func Test_ECS_AlgAndKeyDontMatch(t *testing.T) {
 	}
 
 	message := []byte("this is my message")
-	_, err := ellipticSign(message, opt)
+	_, err := EllipticSign(message, opt)
 	if err == nil {
 		t.Errorf("Error not detected")
 	} else if err.Error() != jwa.ErrInvalidCurve {
@@ -166,13 +166,13 @@ func Test_ECS_VerifyInvalidAlg(t *testing.T) {
 	}
 
 	message := []byte("this is my message")
-	sig, err := ellipticSign(message, opt)
+	sig, err := EllipticSign(message, opt)
 	if err != nil {
 		t.Error("shouldn't had fail.", err)
 	}
 
 	opt.Algorithm = jwa.RS256
-	err = ellipticVerify(message, sig, opt)
+	err = EllipticVerify(message, sig, opt)
 	if err == nil {
 		t.Error("Error undetected")
 	} else if err.Error() != jwa.ErrInvalidKey {
@@ -191,12 +191,12 @@ func Test_ECS_BlankMessage(t *testing.T) {
 
 	message := []byte("")
 
-	sig, err := ellipticSign(message, opt)
+	sig, err := EllipticSign(message, opt)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if err = ellipticVerify(message, sig, opt); err != nil {
+	if err = EllipticVerify(message, sig, opt); err != nil {
 		t.Error(err)
 	}
 }
@@ -211,12 +211,12 @@ func Test_ECS_NilMessage(t *testing.T) {
 
 	message := []byte(nil)
 
-	sig, err := ellipticSign(message, opt)
+	sig, err := EllipticSign(message, opt)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if err = ellipticVerify(message, sig, opt); err != nil {
+	if err = EllipticVerify(message, sig, opt); err != nil {
 		t.Error(err)
 	}
 }
@@ -231,7 +231,7 @@ func Test_ECS_BadAlgGoodKeys(t *testing.T) {
 	}
 
 	message := []byte("message to be signed")
-	_, err := ellipticSign(message, opt)
+	_, err := EllipticSign(message, opt)
 
 	if err == nil {
 		t.Error("undetected error")

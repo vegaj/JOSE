@@ -9,9 +9,9 @@ import "errors"
 	So this struct is the base for the token manipulations.
 */
 type JWT struct {
-	Header     map[string]interface{}
-	Payload    Claims      `json:"payload"`
-	Signatures []Signature `json:"signatures"`
+	Header     map[string]interface{} `json:"headers"`
+	Payload    Claims                 `json:"payload"`
+	Signatures []Signature            `json:"signatures"`
 }
 
 //Signature struct contains a JWE header the signature / MAC algorithm used,
@@ -30,8 +30,8 @@ func Deserialize(data []byte) (JWT, error) {
 }
 
 //NewJWT will create an empty JWT.
-func NewJWT() JWT {
-	return JWT{
+func NewJWT() *JWT {
+	return &JWT{
 		Header:     make(map[string]interface{}),
 		Payload:    make(Claims),
 		Signatures: make([]Signature, 0),

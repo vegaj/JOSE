@@ -45,11 +45,11 @@ const (
 	RS512Name = `RS512`
 
 	//ES256Name signature with the elliptic curve P-256 using SHA-256
-	ES256Name = `EC256`
+	ES256Name = `ES256`
 	//ES384Name signature with the elliptic curve P-384 using SHA-384
-	ES384Name = `EC384`
+	ES384Name = `ES384`
 	//ES512Name signature with the elliptic curve P-521 using SHA-512
-	ES512Name = `EC512`
+	ES512Name = `ES512`
 
 	//ESP256Octets is the required space for signature serialization
 	ESP256Octets = 64
