@@ -175,8 +175,8 @@ func Test_ECS_VerifyInvalidAlg(t *testing.T) {
 	err = EllipticVerify(message, sig, opt)
 	if err == nil {
 		t.Error("Error undetected")
-	} else if err.Error() != jwa.ErrInvalidKey {
-		t.Errorf("Expected %s, found  %v", jwa.ErrInvalidKey, err)
+	} else if err.Error() != jwa.ErrInvalidAlgorithm {
+		t.Errorf("Expected %s, found  %v", jwa.ErrInvalidAlgorithm, err)
 	}
 
 }

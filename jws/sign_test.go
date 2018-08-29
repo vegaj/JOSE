@@ -32,9 +32,9 @@ func Test_JWS_ES256(t *testing.T) {
 func Test_JWS_Foo(t *testing.T) {
 
 	var opt = &Options{
-		Algorithm:  jwa.ES256,
-		PrivateKey: testP256Key,
-		PublicKey:  testP256PubKey,
+		Algorithm:  jwa.ES384,
+		PrivateKey: testP384Key,
+		PublicKey:  testP384PubKey,
 		SignID:     "pepe",
 	}
 

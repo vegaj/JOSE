@@ -26,6 +26,7 @@ func EllipticSign(message []byte, opt *Options) (signature []byte, err error) {
 		return nil, err
 	}
 
+	//In this case, we can trust cap(signature) / 2 because we fixed it in allocSignature.
 	var space = cap(signature) / 2
 	var lower = addPadding(r.Bytes(), space)
 	var upper = addPadding(s.Bytes(), space)
@@ -39,9 +40,16 @@ func EllipticSign(message []byte, opt *Options) (signature []byte, err error) {
 func EllipticVerify(message, signature []byte, opt *Options) (err error) {
 	r, s := big.NewInt(0), big.NewInt(0)
 
-	var space = cap(signature) / 2
-	r = r.SetBytes(removePadding(signature[:space]))
-	s = s.SetBytes(removePadding(signature[space:]))
+	var space = octetsLength(opt.Algorithm)
+	if space < 0 {
+		return errors.New(jwa.ErrInvalidAlgorithm)
+	}
+
+	bytesR := removePadding(signature[:space])
+	bytesS := removePadding(signature[space:])
+
+	r = r.SetBytes(bytesR)
+	s = s.SetBytes(bytesS)
 
 	pub, err := opt.Public()
 	if err != nil {
@@ -88,6 +96,19 @@ func allocSignature(alg jwa.Algorithm) ([]byte, error) {
 		return make([]byte, jwa.ESP521Octets, jwa.ESP521Octets), nil
 	default:
 		return nil, errors.New(jwa.ErrInvalidAlgorithm)
+	}
+}
+
+func octetsLength(alg jwa.Algorithm) int {
+	switch alg {
+	case jwa.ES256:
+		return jwa.ESP256Octets / 2
+	case jwa.ES384:
+		return jwa.ESP384Octets / 2
+	case jwa.ES512:
+		return jwa.ESP521Octets / 2
+	default:
+		return -1
 	}
 }
 

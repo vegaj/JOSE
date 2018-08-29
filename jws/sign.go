@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"errors"
+	"log"
 
 	"github.com/vegaj/JOSE/b64"
 
@@ -104,13 +105,15 @@ func Sign(j *jwt.JWT, opt *Options) error {
 		return err
 	}
 
+	log.Printf("Signature Message:  %s\n", string(message))
+
 	signature.Header = make(map[string]interface{})
 	signature.Header["alg"] = jwa.GetAlgorithmName(opt.Algorithm)
 	signature.Header["kid"] = opt.SignID
 
 	var protected, encodedSignature string
 
-	protectedHeaderJSON, err := json.Marshal(signature.Header)
+	//protectedHeaderJSON, err := json.Marshal(signature.Header)
 	if err != nil {
 		return err
 	}
@@ -125,12 +128,12 @@ func Sign(j *jwt.JWT, opt *Options) error {
 			return err
 		}
 
-		prot, err := EllipticSign(protectedHeaderJSON, opt)
+		/*prot, err := EllipticSign(protectedHeaderJSON, opt)
 		if err != nil {
 			return err
-		}
+		}*/
 
-		protected = b64.EncodeURL(prot)
+		//protected = b64.EncodeURL(prot)
 		encodedSignature = b64.EncodeURL(sig)
 
 	case jwa.RS256, jwa.RS384, jwa.RS512:
@@ -163,6 +166,8 @@ func Verify(j *jwt.JWT, opt *Options) error {
 	if err != nil {
 		return err
 	}
+
+	log.Printf("Verification Message:  %s\n", string(message))
 
 	///var protected = b64.DecodeURL(signature.Protected)
 	var sign = b64.DecodeURL(signature.Signature)
@@ -204,6 +209,9 @@ func createMessage(j *jwt.JWT) ([]byte, error) {
 	if payloadJSON, err = json.Marshal(j.Payload); err != nil {
 		return nil, err
 	}
+
+	log.Printf("header json: %s\n", string(headerJSON))
+	log.Printf("payload json: %s\n", string(payloadJSON))
 
 	return []byte(b64.EncodeURL(headerJSON) + "." + b64.EncodeURL(payloadJSON)), nil
 }
