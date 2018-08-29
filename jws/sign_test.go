@@ -217,3 +217,42 @@ func Test_JWS_NilCals(t *testing.T) {
 		t.Errorf("Expected %s, found %v", jwa.ErrInvalidInput, err)
 	}
 }
+
+func Test_JWS_Integrity(t *testing.T) {
+	var id1, id2 = "pepe", "fido"
+
+	var opt1, opt2 = &Options{
+		Algorithm:  jwa.RS512,
+		PrivateKey: testRSAKey,
+		PublicKey:  testRSAPubKey,
+		SignID:     id1,
+	}, &Options{
+		Algorithm:  jwa.RS384,
+		PrivateKey: testRSAKey2,
+		PublicKey:  testRSAPubKey2,
+		SignID:     id2,
+	}
+
+	var token = jwt.NewJWT()
+
+	if err := Sign(token, opt1); err != nil {
+		t.Error(err)
+	}
+
+	if err := Sign(token, opt2); err != nil {
+		t.Error(err)
+	}
+
+	if len(token.Signatures) != 2 {
+		t.Fatalf("There must be %d signatures, found: %v", 2, token.Signatures)
+	}
+
+	if token.Signatures[0].Header["kid"] != id1 {
+		t.Error("invalid id")
+	}
+
+	if token.Signatures[1].Header["kid"] != id2 {
+		t.Error("invalid id")
+	}
+
+}
