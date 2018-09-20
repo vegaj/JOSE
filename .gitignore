@@ -11,8 +11,6 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-<<<<<<< HEAD
 .vscode
-=======
-.vscode
->>>>>>> 04a7abf6a38c1c32f693713084170d5637421100
+
+*.ps1

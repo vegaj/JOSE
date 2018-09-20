@@ -27,7 +27,8 @@ func EllipticSign(message []byte, opt *Options) (signature []byte, err error) {
 	}
 
 	//In this case, we can trust cap(signature) / 2 because we fixed it in allocSignature.
-	var space = cap(signature) / 2
+
+	var space = len(signature) / 2
 	var lower = addPadding(r.Bytes(), space)
 	var upper = addPadding(s.Bytes(), space)
 	offsetWrite(signature, lower, 0)
