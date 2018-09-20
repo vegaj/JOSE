@@ -1,6 +1,7 @@
 package jws
 
 import (
+	"crypto/rsa"
 	"errors"
 
 	"github.com/vegaj/JOSE/jwa"
@@ -14,12 +15,7 @@ func rsaSignature(message []byte, opt *Options) ([]byte, error) {
 		return nil, errors.New(jwa.ErrInvalidAlgorithm)
 	}
 
-	pk, err := opt.Private()
-	if err != nil {
-		return nil, err
-	}
-
-	return jwa.RSASign(message, pk, opt.Algorithm)
+	return jwa.RSASign(message, opt.Private().(*rsa.PrivateKey), opt.Algorithm)
 }
 
 func rsaVerify(message, signature []byte, opt *Options) error {
@@ -29,12 +25,7 @@ func rsaVerify(message, signature []byte, opt *Options) error {
 		return errors.New(jwa.ErrInvalidAlgorithm)
 	}
 
-	pub, err := opt.Public()
-	if err != nil {
-		return err
-	}
-
-	if err = jwa.RSAVerify(message, signature, pub, opt.Algorithm); err != nil {
+	if err := jwa.RSAVerify(message, signature, opt.Public().(*rsa.PublicKey), opt.Algorithm); err != nil {
 		return errors.New(jwa.ErrAlteredMessage)
 	}
 	return nil

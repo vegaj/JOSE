@@ -8,12 +8,12 @@ import (
 
 func Test_RSA256_Signature(t *testing.T) {
 
-	opt := &Options{
-		Algorithm:  jwa.RS256,
-		PrivateKey: testRSAKey,
-		PublicKey:  testRSAPubKey,
-		SignID:     "rsa-id",
-	}
+	opt := NewOptions(
+		jwa.RS256,
+		testRSAKey,
+		testRSAPubKey,
+		"rsa-id",
+	)
 
 	message := []byte("this is the message")
 	signature, err := rsaSignature(message, opt)
@@ -28,12 +28,12 @@ func Test_RSA256_Signature(t *testing.T) {
 
 func Test_RSA384_Signature(t *testing.T) {
 
-	opt := &Options{
-		Algorithm:  jwa.RS384,
-		PrivateKey: testRSAKey,
-		PublicKey:  testRSAPubKey,
-		SignID:     "rsa-id",
-	}
+	opt := NewOptions(
+		jwa.RS384,
+		testRSAKey,
+		testRSAPubKey,
+		"rsa-id",
+	)
 
 	message := []byte("this is the message")
 	signature, err := rsaSignature(message, opt)
@@ -48,12 +48,12 @@ func Test_RSA384_Signature(t *testing.T) {
 
 func Test_RSA512_Signature(t *testing.T) {
 
-	opt := &Options{
-		Algorithm:  jwa.RS512,
-		PrivateKey: testRSAKey,
-		PublicKey:  testRSAPubKey,
-		SignID:     "rsa-id",
-	}
+	opt := NewOptions(
+		jwa.RS512,
+		testRSAKey,
+		testRSAPubKey,
+		"rsa-id",
+	)
 
 	message := []byte("this is the message")
 	signature, err := rsaSignature(message, opt)
@@ -67,12 +67,12 @@ func Test_RSA512_Signature(t *testing.T) {
 }
 
 func Test_RSADifferentKeys(t *testing.T) {
-	opt := &Options{
-		Algorithm:  jwa.RS512,
-		PrivateKey: testRSAKey,
-		PublicKey:  testRSAPubKey2,
-		SignID:     "rsa-id",
-	}
+	opt := NewOptions(
+		jwa.RS512,
+		testRSAKey,
+		testRSAPubKey2,
+		"rsa-id",
+	)
 
 	message := []byte("this is the message")
 	signature, err := rsaSignature(message, opt)
@@ -89,12 +89,12 @@ func Test_RSADifferentKeys(t *testing.T) {
 
 func Test_RSA_InvalidAlgorithm(t *testing.T) {
 
-	opt := &Options{
-		Algorithm:  jwa.HS256,
-		PrivateKey: testRSAKey,
-		PublicKey:  testRSAPubKey,
-		SignID:     "rsa-id",
-	}
+	opt := NewOptions(
+		jwa.HS256,
+		testRSAKey,
+		testRSAPubKey,
+		"rsa-id",
+	)
 
 	message := []byte("this is the message")
 	signature, err := rsaSignature(message, opt)
@@ -113,12 +113,12 @@ func Test_RSA_InvalidAlgorithm(t *testing.T) {
 }
 
 func Test_RSA_NoKeys(t *testing.T) {
-	opt := &Options{
-		Algorithm:  jwa.RS256,
-		PrivateKey: nil,
-		PublicKey:  nil,
-		SignID:     "rsa-id",
-	}
+	opt := NewOptions(
+		jwa.RS256,
+		nil,
+		nil,
+		"rsa-id",
+	)
 
 	message := []byte("this is the message")
 	signature, err := rsaSignature(message, opt)
@@ -138,12 +138,12 @@ func Test_RSA_NoKeys(t *testing.T) {
 
 func Test_RSA_MadeUpAlgorithm(t *testing.T) {
 
-	opt := &Options{
-		Algorithm:  555555,
-		PrivateKey: testRSAKey,
-		PublicKey:  testRSAPubKey,
-		SignID:     "rsa-id",
-	}
+	opt := NewOptions(
+		555555,
+		testRSAKey,
+		testRSAPubKey,
+		"rsa-id",
+	)
 
 	message := []byte("this is the message")
 	signature, err := rsaSignature(message, opt)
@@ -163,12 +163,12 @@ func Test_RSA_MadeUpAlgorithm(t *testing.T) {
 
 func Test_RSA_MACAlg(t *testing.T) {
 
-	opt := &Options{
-		Algorithm:  jwa.HS512,
-		PrivateKey: testRSAKey,
-		PublicKey:  testRSAPubKey,
-		SignID:     "rsa-id",
-	}
+	opt := NewOptions(
+		jwa.HS512,
+		testRSAKey,
+		testRSAPubKey,
+		"rsa-id",
+	)
 
 	message := []byte("this is the message")
 	signature, err := rsaSignature(message, opt)

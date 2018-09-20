@@ -1,6 +1,7 @@
 package jws
 
 import (
+	"crypto/ecdsa"
 	"errors"
 	"math/big"
 
@@ -10,12 +11,7 @@ import (
 //EllipticSign will perform the signature of message with the given options
 func EllipticSign(message []byte, opt *Options) (signature []byte, err error) {
 
-	priv, err := opt.Private()
-	if err != nil {
-		return nil, err
-	}
-
-	r, s, err := jwa.EllipticSign(message, priv, opt.Algorithm)
+	r, s, err := jwa.EllipticSign(message, opt.Private().(*ecdsa.PrivateKey), opt.Algorithm)
 	if err != nil {
 		return nil, err
 	}
@@ -52,12 +48,7 @@ func EllipticVerify(message, signature []byte, opt *Options) (err error) {
 	r = r.SetBytes(bytesR)
 	s = s.SetBytes(bytesS)
 
-	pub, err := opt.Public()
-	if err != nil {
-		return err
-	}
-
-	err = jwa.EllipticVerify(message, pub, r, s, opt.Algorithm)
+	err = jwa.EllipticVerify(message, opt.Public().(*ecdsa.PublicKey), r, s, opt.Algorithm)
 	return err
 
 }

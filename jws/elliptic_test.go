@@ -47,26 +47,21 @@ func Test_RemoveTrailing(t *testing.T) {
 
 func Test_ECS_SignVerification(t *testing.T) {
 
-	var opt = Options{
-		Algorithm:  jwa.ES256,
-		PrivateKey: testP256Key,
-		PublicKey:  testP256PubKey,
-		SignID:     "my-id",
-	}
+	var opt = NewOptions(jwa.ES256, testP256Key, testP256PubKey, "my-id")
 	var msg = []byte("this is my message. What were you expecting, a real jws?")
-	signature, err := EllipticSign(msg, &opt)
+	signature, err := EllipticSign(msg, opt)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = EllipticVerify(msg, signature, &opt); err != nil {
+	if err = EllipticVerify(msg, signature, opt); err != nil {
 		t.Fatal(err)
 	}
 }
 
 func Test_P256_Basic(t *testing.T) {
 	message := []byte("this is my message")
-	opt := &Options{Algorithm: jwa.ES256, PrivateKey: testP256Key, PublicKey: testP256PubKey, SignID: "this-id"}
+	opt := NewOptions(jwa.ES256, testP256Key, testP256PubKey, "this-id")
 	sig, err := EllipticSign(message, opt)
 	if err != nil {
 		t.Fatal(err)
@@ -79,7 +74,7 @@ func Test_P256_Basic(t *testing.T) {
 
 func Test_P384_Basic(t *testing.T) {
 	message := []byte("this is my message")
-	opt := &Options{Algorithm: jwa.ES384, PrivateKey: testP384Key, PublicKey: testP384PubKey, SignID: "this-id"}
+	opt := NewOptions(jwa.ES384, testP384Key, testP384PubKey, "this-id")
 	sig, err := EllipticSign(message, opt)
 	if err != nil {
 		t.Fatal(err)
@@ -92,7 +87,7 @@ func Test_P384_Basic(t *testing.T) {
 
 func Test_P521_Basic(t *testing.T) {
 	message := []byte("this is my message")
-	opt := &Options{Algorithm: jwa.ES512, PrivateKey: testP521Key, PublicKey: testP521PubKey, SignID: "this-id"}
+	opt := NewOptions(jwa.ES512, testP521Key, testP521PubKey, "this-id")
 	sig, err := EllipticSign(message, opt)
 	if err != nil {
 		t.Fatal(err)
@@ -107,12 +102,7 @@ func Test_P521_Basic(t *testing.T) {
 //Consistency Tests
 
 func Test_ECS_WithNoECAlgorithm(t *testing.T) {
-	opt := &Options{
-		Algorithm:  jwa.RS256,
-		PrivateKey: testP256Key,
-		PublicKey:  testP256PubKey,
-		SignID:     "fail-id",
-	}
+	opt := NewOptions(jwa.RS256, testP256Key, testP256PubKey, "fail-id")
 
 	message := []byte("this is my message")
 	_, err := EllipticSign(message, opt)
@@ -124,12 +114,7 @@ func Test_ECS_WithNoECAlgorithm(t *testing.T) {
 }
 
 func Test_ECS_InvalidAlgorithmKeyPair(t *testing.T) {
-	opt := &Options{
-		Algorithm:  jwa.ES256,
-		PrivateKey: testRSAKey,
-		PublicKey:  testRSAPubKey,
-		SignID:     "fail-id",
-	}
+	opt := NewOptions(jwa.ES256, testRSAKey, testRSAPubKey, "fail-id")
 
 	message := []byte("this is my message")
 	_, err := EllipticSign(message, opt)
@@ -139,12 +124,7 @@ func Test_ECS_InvalidAlgorithmKeyPair(t *testing.T) {
 }
 
 func Test_ECS_AlgAndKeyDontMatch(t *testing.T) {
-	opt := &Options{
-		Algorithm:  jwa.ES256,
-		PrivateKey: testP384Key,
-		PublicKey:  testP384PubKey,
-		SignID:     "fail-id",
-	}
+	opt := NewOptions(jwa.ES256, testP384Key, testP384PubKey, "fail-id")
 
 	message := []byte("this is my message")
 	_, err := EllipticSign(message, opt)
@@ -158,12 +138,12 @@ func Test_ECS_AlgAndKeyDontMatch(t *testing.T) {
 //Verification Tests
 
 func Test_ECS_VerifyInvalidAlg(t *testing.T) {
-	opt := &Options{
-		Algorithm:  jwa.ES256,
-		PrivateKey: testP256Key,
-		PublicKey:  testP256PubKey,
-		SignID:     "fail-id",
-	}
+	opt := NewOptions(
+		jwa.ES256,
+		testP256Key,
+		testP256PubKey,
+		"fail-id",
+	)
 
 	message := []byte("this is my message")
 	sig, err := EllipticSign(message, opt)
@@ -182,12 +162,12 @@ func Test_ECS_VerifyInvalidAlg(t *testing.T) {
 }
 
 func Test_ECS_BlankMessage(t *testing.T) {
-	opt := &Options{
-		Algorithm:  jwa.ES256,
-		PrivateKey: testP256Key,
-		PublicKey:  testP256PubKey,
-		SignID:     "fail-id",
-	}
+	opt := NewOptions(
+		jwa.ES256,
+		testP256Key,
+		testP256PubKey,
+		"fail-id",
+	)
 
 	message := []byte("")
 
@@ -202,12 +182,12 @@ func Test_ECS_BlankMessage(t *testing.T) {
 }
 
 func Test_ECS_NilMessage(t *testing.T) {
-	opt := &Options{
-		Algorithm:  jwa.ES256,
-		PrivateKey: testP256Key,
-		PublicKey:  testP256PubKey,
-		SignID:     "fail-id",
-	}
+	opt := NewOptions(
+		jwa.ES256,
+		testP256Key,
+		testP256PubKey,
+		"fail-id",
+	)
 
 	message := []byte(nil)
 
@@ -223,12 +203,12 @@ func Test_ECS_NilMessage(t *testing.T) {
 
 func Test_ECS_BadAlgGoodKeys(t *testing.T) {
 
-	opt := &Options{
-		Algorithm:  jwa.HS256,
-		PrivateKey: testP256Key,
-		PublicKey:  testP256PubKey,
-		SignID:     "hi",
-	}
+	opt := NewOptions(
+		jwa.HS256,
+		testP256Key,
+		testP256PubKey,
+		"hi",
+	)
 
 	message := []byte("message to be signed")
 	_, err := EllipticSign(message, opt)

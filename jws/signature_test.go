@@ -9,26 +9,20 @@ import (
 )
 
 func Test_JWS_MultiSignature(t *testing.T) {
-	var opt = &Options{
-		Algorithm:  jwa.ES256,
-		PrivateKey: testP256Key,
-		PublicKey:  testP256PubKey,
-		SignID:     "elliptic-signature",
-	}
+	var opt = BlankOptions()
+	opt.Algorithm = jwa.ES256
+	opt.SignID = "elliptic-signnature"
+	opt.LoadPrivateKey(testP256Key).LoadPublicKey(testP256PubKey)
 
-	var opt2 = &Options{
-		Algorithm:  jwa.RS256,
-		PrivateKey: testRSAKey,
-		PublicKey:  testRSAPubKey,
-		SignID:     "rsa-signature",
-	}
+	var opt2 = BlankOptions()
+	opt2.Algorithm = jwa.RS256
+	opt2.LoadPrivateKey(testRSAKey).LoadPublicKey(testRSAPubKey)
+	opt2.SignID = "rsa-signature"
 
-	var opt3 = &Options{
-		Algorithm:  jwa.ES512,
-		PrivateKey: testP521Key,
-		PublicKey:  testP521PubKey,
-		SignID:     "es512-signature",
-	}
+	var opt3 = BlankOptions()
+	opt3.Algorithm = jwa.ES512
+	opt.LoadPrivateKey(testP521Key).LoadPublicKey(testP521Key)
+	opt3.SignID = "es512-signature"
 
 	var token = jwt.NewJWT()
 	token.SetIssuer("pepe")
@@ -60,12 +54,10 @@ func Test_JWS_MultiSignature(t *testing.T) {
 }
 
 func Test_JWS_ES256(t *testing.T) {
-	var opt = &Options{
-		Algorithm:  jwa.ES256,
-		PrivateKey: testP256Key,
-		PublicKey:  testP256PubKey,
-		SignID:     "pepe",
-	}
+	var opt = BlankOptions()
+	opt.Algorithm = jwa.ES256
+	opt.LoadPrivateKey(testP256Key).LoadPublicKey(testP256PubKey)
+	opt.SignID = "pepe"
 
 	var token = jwt.NewJWT()
 	token.SetIssuer("pepe")
@@ -81,12 +73,11 @@ func Test_JWS_ES256(t *testing.T) {
 }
 
 func Test_JWS_ES384(t *testing.T) {
-	var opt = &Options{
-		Algorithm:  jwa.ES384,
-		PrivateKey: testP384Key,
-		PublicKey:  testP384PubKey,
-		SignID:     "pepe",
-	}
+
+	var opt = BlankOptions()
+	opt.Algorithm = jwa.ES384
+	opt.SignID = "pepe"
+	opt.LoadPrivateKey(testP384Key).LoadPublicKey(testP384PubKey)
 
 	var token = jwt.NewJWT()
 	token.SetIssuer("pepe")
@@ -102,12 +93,11 @@ func Test_JWS_ES384(t *testing.T) {
 }
 
 func Test_JWS_ES521(t *testing.T) {
-	var opt = &Options{
-		Algorithm:  jwa.ES512,
-		PrivateKey: testP521Key,
-		PublicKey:  testP521PubKey,
-		SignID:     "pepe",
-	}
+
+	var opt = BlankOptions()
+	opt.Algorithm = jwa.ES512
+	opt.SignID = "pepe"
+	opt.LoadPrivateKey(testP521Key).LoadPublicKey(testP521PubKey)
 
 	var token = jwt.NewJWT()
 	token.SetIssuer("pepe")
@@ -123,12 +113,11 @@ func Test_JWS_ES521(t *testing.T) {
 }
 
 func Test_JWS_RSA256(t *testing.T) {
-	var opt = &Options{
-		Algorithm:  jwa.RS256,
-		PrivateKey: testRSAKey,
-		PublicKey:  testRSAPubKey,
-		SignID:     "pepe-rsa",
-	}
+
+	var opt = BlankOptions()
+	opt.Algorithm = jwa.RS256
+	opt.SignID = "pepe-rsa"
+	opt.LoadPrivateKey(testRSAKey).LoadPublicKey(testRSAPubKey)
 
 	var token = jwt.NewJWT()
 	token.SetIssuer("pepe")
@@ -145,12 +134,10 @@ func Test_JWS_RSA256(t *testing.T) {
 
 func Test_JWS_InvalidES256(t *testing.T) {
 
-	var opt = &Options{
-		Algorithm:  jwa.ES256,
-		PrivateKey: testP384Key,
-		PublicKey:  testP256PubKey,
-		SignID:     "fido",
-	}
+	var opt = BlankOptions()
+	opt.Algorithm = jwa.ES256
+	opt.SignID = "fido"
+	opt.LoadPrivateKey(testP384Key).LoadPublicKey(testP256Key)
 
 	token := jwt.NewJWT()
 	token.SetIssuer("fido")
@@ -164,19 +151,15 @@ func Test_JWS_InvalidES256(t *testing.T) {
 
 func Test_JWS_SameSignID(t *testing.T) {
 
-	var opt = &Options{
-		Algorithm:  jwa.RS256,
-		PrivateKey: testRSAKey,
-		PublicKey:  testRSAPubKey,
-		SignID:     "rsa",
-	}
+	var opt = BlankOptions()
+	opt.Algorithm = jwa.RS256
+	opt.SignID = "rsa"
+	opt.LoadPrivateKey(testRSAKey).LoadPublicKey(testRSAPubKey)
 
-	var opt2 = &Options{
-		Algorithm:  jwa.RS256,
-		PrivateKey: testRSAKey2,
-		PublicKey:  testRSAPubKey2,
-		SignID:     "rsa",
-	}
+	var opt2 = BlankOptions()
+	opt2.Algorithm = jwa.RS256
+	opt2.SignID = "rsa"
+	opt2.LoadPrivateKey(testRSAKey2).LoadPublicKey(testRSAPubKey2)
 
 	token := jwt.NewJWT()
 	token.SetAudience([]string{"pepe", "fido"})
@@ -221,17 +204,14 @@ func Test_JWS_NilCals(t *testing.T) {
 func Test_JWS_Integrity(t *testing.T) {
 	var id1, id2 = "pepe", "fido"
 
-	var opt1, opt2 = &Options{
-		Algorithm:  jwa.RS512,
-		PrivateKey: testRSAKey,
-		PublicKey:  testRSAPubKey,
-		SignID:     id1,
-	}, &Options{
-		Algorithm:  jwa.RS384,
-		PrivateKey: testRSAKey2,
-		PublicKey:  testRSAPubKey2,
-		SignID:     id2,
-	}
+	var opt1, opt2 = BlankOptions(), BlankOptions()
+	opt1.Algorithm = jwa.RS512
+	opt1.SignID = id1
+	opt1.LoadPrivateKey(testRSAKey).LoadPublicKey(testRSAPubKey)
+
+	opt2.Algorithm = jwa.RS384
+	opt2.SignID = id2
+	opt2.LoadPrivateKey(testRSAKey2).LoadPublicKey(testRSAPubKey2)
 
 	var token = jwt.NewJWT()
 
