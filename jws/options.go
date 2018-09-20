@@ -3,6 +3,7 @@ package jws
 import (
 	"crypto"
 	"crypto/x509"
+	"errors"
 
 	"github.com/vegaj/JOSE/jwa"
 )
@@ -44,22 +45,22 @@ func (opt *Options) Private() crypto.PrivateKey {
 //LoadPrivateKey takes a DER encoded PrivateKey and an algorithm to be used to sign.
 //The keys for EllipticCurve must be in the a ASN.1 DER form.
 //In the case of RSA only the ASN.1 PKCS#1 DER format is allowed.
-func (opt *Options) LoadPrivateKey(privateKey []byte) *Options {
+func (opt *Options) LoadPrivateKey(privateKey []byte) error {
 	var k crypto.PrivateKey
 	var err error
 	switch opt.Algorithm {
 	case jwa.ES256, jwa.ES384, jwa.ES512:
 		k, err = x509.ParseECPrivateKey(privateKey)
 		if err != nil {
-			panic(err)
+			return err
 		}
 	case jwa.RS256, jwa.RS384, jwa.RS512:
 		k, err = x509.ParsePKCS1PrivateKey(privateKey)
 		if err != nil {
-			panic(err)
+			return err
 		}
 	default:
-		panic(jwa.ErrInvalidAlgorithm)
+		return errors.New(jwa.ErrInvalidAlgorithm)
 	}
 
 	var digs = digSign{
@@ -68,28 +69,28 @@ func (opt *Options) LoadPrivateKey(privateKey []byte) *Options {
 	}
 
 	opt.keySet = digs
-	return opt
+	return nil
 }
 
 //LoadPublicKey takes a DER encoded PublicKey and an algorithm to be used to verify.
 //The keys for EC must be an PKIX form.
 //In the case of RSA only a ASN.1 PKCS#1 DER public key is allowed.
-func (opt *Options) LoadPublicKey(publicKey []byte) *Options {
+func (opt *Options) LoadPublicKey(publicKey []byte) error {
 	var k crypto.PublicKey
 	var err error
 	switch opt.Algorithm {
 	case jwa.ES256, jwa.ES384, jwa.ES512:
 		k, err = x509.ParsePKIXPublicKey(publicKey)
 		if err != nil {
-			panic(err)
+			return err
 		}
 	case jwa.RS256, jwa.RS384, jwa.RS512:
 		k, err = x509.ParsePKCS1PublicKey(publicKey)
 		if err != nil {
-			panic(err)
+			return err
 		}
 	default:
-		panic(jwa.ErrInvalidAlgorithm)
+		return errors.New(jwa.ErrInvalidAlgorithm)
 	}
 
 	var digs = digSign{
@@ -98,7 +99,7 @@ func (opt *Options) LoadPublicKey(publicKey []byte) *Options {
 	}
 
 	opt.keySet = digs
-	return opt
+	return nil
 }
 
 func (d digSign) Public() crypto.PublicKey {
@@ -119,5 +120,13 @@ func NewOptions(alg jwa.Algorithm, priv, pub []byte, signID string) *Options {
 	var opt = BlankOptions()
 	opt.Algorithm = alg
 	opt.SignID = signID
-	return opt.LoadPrivateKey(priv).LoadPublicKey(pub)
+	if opt.LoadPrivateKey(priv) != nil {
+		return nil
+	}
+
+	if opt.LoadPublicKey(pub) != nil {
+		return nil
+	}
+
+	return opt
 }

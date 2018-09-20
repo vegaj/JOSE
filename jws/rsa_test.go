@@ -95,19 +95,8 @@ func Test_RSA_InvalidAlgorithm(t *testing.T) {
 		testRSAPubKey,
 		"rsa-id",
 	)
-
-	message := []byte("this is the message")
-	signature, err := rsaSignature(message, opt)
-	if err == nil {
-		t.Errorf("Error missed")
-	} else if err.Error() != jwa.ErrInvalidAlgorithm {
-		t.Errorf("Expected <%s>. Found <%v>", jwa.ErrInvalidAlgorithm, err)
-	}
-
-	if err = rsaVerify(message, signature, opt); err == nil {
-		t.Errorf("Error missed")
-	} else if err.Error() != jwa.ErrInvalidAlgorithm {
-		t.Errorf("Expected <%s>. Found <%v>", jwa.ErrInvalidAlgorithm, err)
+	if opt != nil {
+		t.Errorf("opt expected to be nil")
 	}
 
 }
@@ -119,19 +108,8 @@ func Test_RSA_NoKeys(t *testing.T) {
 		nil,
 		"rsa-id",
 	)
-
-	message := []byte("this is the message")
-	signature, err := rsaSignature(message, opt)
-	if err == nil {
-		t.Errorf("Error missed")
-	} else if err.Error() != jwa.ErrInvalidKey {
-		t.Errorf("Expected <%s>. Found <%v>", jwa.ErrInvalidKey, err)
-	}
-
-	if err = rsaVerify(message, signature, opt); err == nil {
-		t.Errorf("Error missed")
-	} else if err.Error() != jwa.ErrInvalidKey {
-		t.Errorf("Expected <%s>. Found <%v>", jwa.ErrInvalidKey, err)
+	if opt != nil {
+		t.Errorf("opt expected to be nil")
 	}
 
 }
@@ -145,20 +123,9 @@ func Test_RSA_MadeUpAlgorithm(t *testing.T) {
 		"rsa-id",
 	)
 
-	message := []byte("this is the message")
-	signature, err := rsaSignature(message, opt)
-	if err == nil {
-		t.Errorf("Error missed")
-	} else if err.Error() != jwa.ErrInvalidAlgorithm {
-		t.Errorf("Expected <%s>. Found <%v>", jwa.ErrInvalidAlgorithm, err)
+	if opt != nil {
+		t.Errorf("opt expected to be nil")
 	}
-
-	if err = rsaVerify(message, signature, opt); err == nil {
-		t.Errorf("Error missed")
-	} else if err.Error() != jwa.ErrInvalidAlgorithm {
-		t.Errorf("Expected <%s>. Found <%v>", jwa.ErrInvalidAlgorithm, err)
-	}
-
 }
 
 func Test_RSA_MACAlg(t *testing.T) {
@@ -170,18 +137,8 @@ func Test_RSA_MACAlg(t *testing.T) {
 		"rsa-id",
 	)
 
-	message := []byte("this is the message")
-	signature, err := rsaSignature(message, opt)
-	if err == nil {
-		t.Errorf("Error missed")
-	} else if err.Error() != jwa.ErrInvalidAlgorithm {
-		t.Errorf("Expected <%s>. Found <%v>", jwa.ErrAlteredMessage, err)
-	}
-
-	if err = rsaVerify(message, signature, opt); err == nil {
-		t.Errorf("Error missed")
-	} else if err.Error() != jwa.ErrInvalidAlgorithm {
-		t.Errorf("Expected <%s>. Found <%v>", jwa.ErrAlteredMessage, err)
+	if opt != nil {
+		t.Errorf("opt expected to be nil")
 	}
 
 }

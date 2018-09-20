@@ -104,22 +104,15 @@ func Test_P521_Basic(t *testing.T) {
 func Test_ECS_WithNoECAlgorithm(t *testing.T) {
 	opt := NewOptions(jwa.RS256, testP256Key, testP256PubKey, "fail-id")
 
-	message := []byte("this is my message")
-	_, err := EllipticSign(message, opt)
-	if err == nil {
-		t.Errorf("Error not detected")
-	} else if err.Error() != jwa.ErrInvalidKey {
-		t.Errorf("Expected error: %s, found %v", jwa.ErrInvalidKey, err)
+	if opt != nil {
+		t.Errorf("opt should be nil")
 	}
 }
 
 func Test_ECS_InvalidAlgorithmKeyPair(t *testing.T) {
 	opt := NewOptions(jwa.ES256, testRSAKey, testRSAPubKey, "fail-id")
-
-	message := []byte("this is my message")
-	_, err := EllipticSign(message, opt)
-	if err == nil {
-		t.Errorf("Error not detected")
+	if opt != nil {
+		t.Errorf("Expected opt to be nil")
 	}
 }
 
@@ -209,13 +202,7 @@ func Test_ECS_BadAlgGoodKeys(t *testing.T) {
 		testP256PubKey,
 		"hi",
 	)
-
-	message := []byte("message to be signed")
-	_, err := EllipticSign(message, opt)
-
-	if err == nil {
-		t.Error("undetected error")
-	} else if err.Error() != jwa.ErrInvalidKey {
-		t.Errorf("%s - %v", jwa.ErrInvalidKey, err)
+	if opt != nil {
+		t.Errorf("opt expected to be nil")
 	}
 }
