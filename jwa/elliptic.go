@@ -8,7 +8,6 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"errors"
-	"hash"
 	"math/big"
 )
 
@@ -18,11 +17,6 @@ var zero = big.NewInt(0)
 func EllipticSign(message []byte, priv crypto.PrivateKey, alg Algorithm) (r, s *big.Int, err error) {
 
 	var pk *ecdsa.PrivateKey
-	/*if pk, err = x509.ParseECPrivateKey(privateKey); err != nil {
-		return zero, zero, err
-	}
-	*/
-
 	var ok bool
 	if pk, ok = priv.(*ecdsa.PrivateKey); !ok {
 		return zero, zero, errors.New(ErrInvalidKey)
@@ -44,12 +38,6 @@ func EllipticSign(message []byte, priv crypto.PrivateKey, alg Algorithm) (r, s *
 //EllipticVerify for the ESXXX digital signature algorithms. error = nil means Verification correct.
 func EllipticVerify(message []byte, publicKey crypto.PublicKey, r, s *big.Int, alg Algorithm) error {
 
-	/*
-		pk, err := x509.ParsePKIXPublicKey(publicKey)
-		if err != nil {
-			return err
-		}
-	*/
 	var err error
 	if pub, ok := publicKey.(*ecdsa.PublicKey); ok {
 
@@ -73,20 +61,26 @@ func EllipticVerify(message []byte, publicKey crypto.PublicKey, r, s *big.Int, a
 }
 
 func doHashAlg(message []byte, alg Algorithm) []byte {
-	var hash hash.Hash
+	//	var hash hash.Hash
 	switch alg {
 	case ES256:
-		hash = sha256.New()
+		a := sha256.Sum256(message)
+		return a[:]
+		//hash = sha256.New()
 	case ES384:
-		hash = sha512.New384()
+		a := sha512.Sum384(message)
+		return a[:]
+		//hash = sha512.New384()
 	case ES512:
-		hash = sha512.New()
+		a := sha512.Sum512(message)
+		return a[:]
+		//hash = sha512.New()
 	default:
 		return nil
 	}
 
-	hash.Write(message)
-	return hash.Sum(nil)
+	//hash.Write(message)
+	//return hash.Sum(nil)
 }
 
 //Each ESXXX algorithm has a curve assigned. If the key has a Curve with a name different that

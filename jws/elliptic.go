@@ -27,9 +27,12 @@ func EllipticSign(message []byte, opt *Options) (signature []byte, err error) {
 	var space = len(signature) / 2
 	var lower = addPadding(r.Bytes(), space)
 	var upper = addPadding(s.Bytes(), space)
-	offsetWrite(signature, lower, 0)
-	offsetWrite(signature, upper, space)
-
+	//offsetWrite(signature, lower, 0)
+	//offsetWrite(signature, upper, space)
+	signature = append(lower, upper...)
+	if len(signature) != jwa.ESP256Octets && len(signature) != jwa.ESP384Octets && len(signature) != jwa.ESP521Octets {
+		panic(len(signature))
+	}
 	return signature, nil
 }
 
@@ -81,11 +84,11 @@ func offsetWrite(dst, p []byte, offset int) (n int, err error) {
 func allocSignature(alg jwa.Algorithm) ([]byte, error) {
 	switch alg {
 	case jwa.ES256:
-		return make([]byte, jwa.ESP256Octets, jwa.ESP256Octets), nil
+		return make([]byte, jwa.ESP256Octets), nil
 	case jwa.ES384:
-		return make([]byte, jwa.ESP384Octets, jwa.ESP384Octets), nil
+		return make([]byte, jwa.ESP384Octets), nil
 	case jwa.ES512:
-		return make([]byte, jwa.ESP521Octets, jwa.ESP521Octets), nil
+		return make([]byte, jwa.ESP521Octets), nil
 	default:
 		return nil, errors.New(jwa.ErrInvalidAlgorithm)
 	}
