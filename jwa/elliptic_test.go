@@ -68,9 +68,8 @@ func Test_EC521_SignVerify(t *testing.T) {
 }
 
 //Test_EC256_UsingGreaterCurve. In this case, the key is generated using a curve greater than the expected
-//in EC256 wich should be the curve P256 with SHA-256. But this don't fails, because the keys used for signature
-//and verification match. The hasing algorithm used is not the expected but it's used consistently.
-
+//in EC256 wich should be the curve P256 with SHA-256. But this doesn't fail, because the keys used for signature
+//and verification match. The hashing algorithm used is not the expected one but it's used consistently.
 func Test_EC256_UsingGreaterCurve(t *testing.T) {
 
 	var err error

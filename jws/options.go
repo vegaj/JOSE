@@ -10,9 +10,11 @@ import (
 
 //Options to perform a signature.
 type Options struct {
+	//The Algorithm to be used for both signing and verifying
 	Algorithm jwa.Algorithm
-	SignID    string
-	keySet    DigitalSignatureKeySet
+	//Identifier for this signature.
+	SignID string
+	keySet DigitalSignatureKeySet
 }
 
 //DigitalSignatureKeySet is the interface that gives access to the KeyPairs for Sign/Verify

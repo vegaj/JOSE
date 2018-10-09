@@ -8,7 +8,7 @@ import (
 	"math/big"
 )
 
-//ESSignatureWriter is a io.WriteSeeker
+//ESSignatureWriter is a io.WriteSeeker | DEPRECATED
 type ESSignatureWriter struct {
 	Data  []byte
 	Index int64
