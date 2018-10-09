@@ -61,12 +61,18 @@ func main() {
 	log.Printf("There are %d signatures.\n", len(token.Signatures))
 	log.Printf("Header:%v\n\nProtected:%v\n\nSignature:%v\n\n", signature.Header, signature.Protected, signature.Signature)
 
+	if err = jws.Verify(token, opt); err != nil {
+		log.Println(err)
+	} else {
+		log.Println("token verified")
+	}
+
 	compact, err := token.CompactSerialization()
 	if err != nil {
 		panic(err)
 	}
 
 	//send it to someone, store it as a cookie, so on.
-	ioutil.WriteFile("./compactToken.bin", compact, 0)
+	ioutil.WriteFile("./compactToken.b64", compact, 0)
 
 }
